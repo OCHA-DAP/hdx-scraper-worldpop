@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def main(configuration):
     '''Generate dataset and create it in HDX'''
 
-    generate_datasets(configuration, datetime.now())
+    generate_datasets(configuration)
 
 if __name__ == '__main__':
     facade(main, hdx_site='test')

@@ -10,12 +10,11 @@ Reads WorldPop JSON.
 
 import logging
 
-import sys
-from datetime import datetime
 from os.path import join, expanduser
 
+import sys
 from hdx.data.dataset import Dataset
-from iso8601 import iso8601
+from hdx.data.hdxobject import HDXError
 from slugify import slugify
 import requests
 
@@ -41,12 +40,7 @@ def load_worldpop_key(path: str) -> str:
     return auth
 
 
-def get_dataset_date(datestr):
-    date = iso8601.parse_date(datestr)
-    return date.date().strftime('%m/%d/%Y')
-
-
-def generate_datasets(configuration, today, iso=None):
+def generate_datasets(configuration):
     '''Parse json of the form:
     {
       "Location": "Zimbabwe",
@@ -115,9 +109,6 @@ def generate_datasets(configuration, today, iso=None):
             'maintainer': countrydata['maintainerName'],
             'maintainer_email': countrydata['maintainerEmail'],
         })
-        dataset.set_dataset_date(countrydata['datasetDate'])
-        dataset.set_expected_update_frequency(countrydata['updateFrequency'])
-        dataset.add_country_location(countrydata['location'])
         dataset.add_tags(countrydata['tags'])
         if licence:
             dataset.update({'license_other': licence})
@@ -141,4 +132,17 @@ def generate_datasets(configuration, today, iso=None):
         }
         dataset.add_update_galleryitem(galleryitem)
         dataset.update_from_yaml()
-        dataset.create_in_hdx()
+        try:
+            dataset.set_dataset_date(countrydata['datasetDate'])
+            dataset.set_expected_update_frequency(countrydata['updateFrequency'])
+            dataset.add_country_location(countrydata['location'])
+            # import http.client as http_client
+            # http_client.HTTPConnection.debuglevel = 1
+            # logger.setLevel(logging.DEBUG)
+            # requests_log = logging.getLogger("requests.packages.urllib3")
+            # requests_log.setLevel(logging.DEBUG)
+            # requests_log.propagate = True
+            dataset.create_in_hdx()
+        except HDXError as e:
+            logger.exception('%s has a problem!' % title)
+            continue

@@ -1,3 +1,2 @@
 awesome-slugify==1.6.5
-iso8601==0.1.11
-git+git://github.com/ocha-dap/hdx-python-api.git@v0.65#egg=hdx-python-api
+git+git://github.com/ocha-dap/hdx-python-api.git@v0.66#egg=hdx-python-api
