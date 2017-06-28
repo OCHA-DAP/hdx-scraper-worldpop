@@ -1,47 +1,30 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 WORLDPOP:
 ------------
 
-Reads WorldPop JSON.
+Reads WorldPop JSON and creates datasets.
 
-'''
+"""
 
 import logging
 
-from os.path import join, expanduser
-
-import sys
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from slugify import slugify
-import requests
 
 logger = logging.getLogger(__name__)
 
 
-def load_worldpop_key(path: str) -> str:
-    """
-    Load WorldPop key
-
-    Args:
-        path (str): Path to WorldPop key
-
-    Returns:
-        str: WorldPop authorisation
-
-    """
-    with open(path, 'rt') as f:
-        auth = f.read().replace('\n', '')
-    if not auth:
-        raise (ValueError('WorldPop key is empty!'))
-    logger.info('Loaded WorldPop key from: %s' % path)
-    return auth
+def get_countriesdata(json_url, downloader):
+    response = downloader.download(json_url)
+    worldpopjson = response.json()
+    return worldpopjson['worldPopData']
 
 
-def generate_datasets(configuration):
-    '''Parse json of the form:
+def generate_dataset(downloader, countrydata):
+    """Parse json of the form:
     {
       "Location": "Zimbabwe",
       "Dataset Title": "WorldPop Zimbabwe Population dataset",
@@ -73,76 +56,62 @@ def generate_datasets(configuration):
         "University of Southampton"
       ]
     },
-    '''
-    auth = load_worldpop_key(join(expanduser("~"), '.worldpopkey'))
-    r = requests.get(configuration['json_url'], headers = {'Authorization': auth})
-    r.raise_for_status()
-    worldpopdata = r.json()['worldPopData']
-    logger.info('Number of datasets to upload: %d' % len(worldpopdata))
-    for countrydata in worldpopdata:
-        title = countrydata['Dataset Title'].replace(' dataset', '')
-        logger.info('Creating dataset: %s' % title)
-        licence_id = countrydata['License'].lower()
-        licence = None
-        if licence_id == 'other':
-            licence_id = 'hdx-other'
-            licence_url = countrydata['Define License']
-            r = requests.get(licence_url)
-            r.raise_for_status()
-            licence = r.text
-        slugified_name = slugify(title).lower()
-        url_summary = countrydata['URL_summaryPage']
-        description = 'Go to [WorldPop Dataset Summary Page](%s) for more information' % url_summary
-        dataset = Dataset(configuration, {
-            'name': slugified_name,
-            'title': title,
-            'notes': countrydata['Description'],
-            'methodology': 'Other',
-            'methodology_other': description,
-            'dataset_source': countrydata['Source'],
-            'subnational': countrydata['Dataset contains sub-national data'] == True,
-            'license_id': licence_id,
-            'private': countrydata['Visibility'] != 'Public',
-            'url': url_summary,
-            'author': countrydata['authorName'],
-            'author_email': countrydata['authorEmail'],
-            'maintainer': countrydata['maintainerName'],
-            'maintainer_email': countrydata['maintainerEmail'],
-        })
-        dataset.add_tags(countrydata['tags'])
-        if licence:
-            dataset.update({'license_other': licence})
+    """
+    title = countrydata['Dataset Title'].replace(' dataset', '')
+    logger.info('Creating dataset: %s' % title)
+    licence_id = countrydata['License'].lower()
+    licence = None
+    if licence_id == 'other':
+        licence_id = 'hdx-other'
+        licence_url = countrydata['Define License']
+        response = downloader.download(licence_url)
+        licence = response.text
+    slugified_name = slugify(title).lower()
+    url_summary = countrydata['URL_summaryPage']
+    description = 'Go to [WorldPop Dataset Summary Page](%s) for more information' % url_summary
+    dataset = Dataset({
+        'name': slugified_name,
+        'title': title,
+        'notes': countrydata['Description'],
+        'methodology': 'Other',
+        'methodology_other': description,
+        'dataset_source': countrydata['Source'],
+        'subnational': countrydata['Dataset contains sub-national data'] == True,
+        'license_id': licence_id,
+        'private': countrydata['Visibility'] != 'Public',
+        'url': url_summary,
+        'author': countrydata['authorName'],
+        'author_email': countrydata['authorEmail'],
+        'maintainer': countrydata['maintainerName'],
+        'maintainer_email': countrydata['maintainerEmail'],
+    })
+    try:
+        dataset.set_dataset_date(countrydata['datasetDate'])
+        dataset.set_expected_update_frequency(countrydata['updateFrequency'])
+        dataset.add_country_location(countrydata['location'])
+    except HDXError as e:
+        logger.exception('%s has a problem! %s' % (title, e))
+        return None
+    dataset.add_tags(countrydata['tags'])
+    if licence:
+        dataset.update({'license_other': licence})
 
-        resource = {
-            'name': title,
-            'format': countrydata['fileFormat'],
-            'url': countrydata['URL_direct'],
-            'description': description,
-            'url_type': 'api',
-            'resource_type': 'api'
-        }
-        dataset.add_update_resource(resource)
+    resource = {
+        'name': title,
+        'format': countrydata['fileFormat'],
+        'url': countrydata['URL_direct'],
+        'description': description,
+        'url_type': 'api',
+        'resource_type': 'api'
+    }
+    dataset.add_update_resource(resource)
 
-        galleryitem = {
-            'title': 'WorldPop Dataset Summary Page',
-            'type': 'post',
-            'description': '%s Summary Page' % title,
-            'url': url_summary,
-            'image_url': countrydata['URL_image']
-        }
-        dataset.add_update_galleryitem(galleryitem)
-        dataset.update_from_yaml()
-        try:
-            dataset.set_dataset_date(countrydata['datasetDate'])
-            dataset.set_expected_update_frequency(countrydata['updateFrequency'])
-            dataset.add_country_location(countrydata['location'])
-            # import http.client as http_client
-            # http_client.HTTPConnection.debuglevel = 1
-            # logger.setLevel(logging.DEBUG)
-            # requests_log = logging.getLogger("requests.packages.urllib3")
-            # requests_log.setLevel(logging.DEBUG)
-            # requests_log.propagate = True
-            dataset.create_in_hdx()
-        except HDXError as e:
-            logger.exception('%s has a problem!' % title)
-            continue
+    galleryitem = {
+        'title': 'WorldPop Dataset Summary Page',
+        'type': 'post',
+        'description': '%s Summary Page' % title,
+        'url': url_summary,
+        'image_url': countrydata['URL_image']
+    }
+    dataset.add_update_galleryitem(galleryitem)
+    return dataset

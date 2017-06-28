@@ -1,0 +1,3 @@
+# Collector specific configuration
+json_url: "http://www.worldpop.org.uk/getJSON/"
+

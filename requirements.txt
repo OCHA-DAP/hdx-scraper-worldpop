@@ -1,2 +1,2 @@
 awesome-slugify==1.6.5
-git+git://github.com/ocha-dap/hdx-python-api.git@v0.66#egg=hdx-python-api
+hdx-python-api==1.4.2
