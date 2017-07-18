@@ -112,7 +112,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
     showcase = Showcase({
         'name': '%s-showcase' % slugified_name,
         'title': 'WorldPop %s Summary Page' % location,
-        'notes': '%s Summary Page' % title,
+        'notes': 'Click the image on the right to go to the WorldPop summary page for the %s dataset' % location,
         'url': url_summary,
         'image_url': countrydata['URL_image']
     })
