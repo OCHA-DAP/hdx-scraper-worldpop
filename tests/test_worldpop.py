@@ -7,8 +7,8 @@ Unit tests for worldpop.
 from os.path import join
 
 import pytest
-from hdx.configuration import Configuration
-from worldpop import generate_dataset, get_countriesdata
+from hdx.hdx_configuration import Configuration
+from worldpop import generate_dataset_and_showcase, get_countriesdata
 
 
 class TestWorldPop:
@@ -66,8 +66,8 @@ class TestWorldPop:
         countriesdata = get_countriesdata('http://lala/getJSON/', downloader)
         assert countriesdata == [TestWorldPop.countrydata]
 
-    def test_generate_dataset(self, configuration, downloader):
-        dataset = generate_dataset(downloader, TestWorldPop.countrydata)
+    def test_generate_dataset_and_showcase(self, configuration, downloader):
+        dataset, showcase = generate_dataset_and_showcase(downloader, TestWorldPop.countrydata)
         assert dataset == {'dataset_source': 'WorldPop, University of Southampton, UK',
                            'notes': 'These datasets provide estimates of population counts ... information.',
                            'data_update_frequency': '365',
@@ -87,4 +87,11 @@ class TestWorldPop:
                            'maintainer_email': 'worldpop@geodata.soton.ac.uk',
                            'title': 'WorldPop Zimbabwe Population',
                            'author_email': 'worldpop@geodata.soton.ac.uk'}
+
+        assert showcase == {'image_url': 'http://www.worldpop.org.uk/data/WorldPop_data/AllContinents/ZWE-POP_500.JPG',
+                            'name': 'worldpop-zimbabwe-population-showcase',
+                            'title': 'WorldPop Zimbabwe Summary Page',
+                            'notes': 'WorldPop Zimbabwe Population Summary Page',
+                            'url': 'http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population',
+                            'tags': [{'name': 'Population Statistics'}, {'name': 'WorldPop'}, {'name': 'University of Southampton'}]}
 

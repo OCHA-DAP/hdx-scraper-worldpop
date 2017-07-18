@@ -7,11 +7,11 @@ Top level script. Calls other functions that generate datasets that this script 
 import logging
 from os.path import join, expanduser
 
-from hdx.configuration import Configuration
+from hdx.hdx_configuration import Configuration
 from hdx.facades.hdx_scraperwiki import facade
 from hdx.utilities.downloader import Download
 
-from worldpop import generate_dataset, get_countriesdata
+from worldpop import generate_dataset_and_showcase, get_countriesdata
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +24,12 @@ def main():
     countriesdata = get_countriesdata(json_url, downloader)
     logger.info('Number of datasets to upload: %d' % len(countriesdata))
     for countrydata in countriesdata:
-        dataset = generate_dataset(downloader, countrydata)
+        dataset, showcase = generate_dataset_and_showcase(downloader, countrydata)
         if dataset is not None:
             dataset.update_from_yaml()
             dataset.create_in_hdx()
+            showcase.create_in_hdx()
+            showcase.add_dataset(dataset)
 
 if __name__ == '__main__':
-    facade(main, hdx_site='test', project_config_yaml=join('config', 'project_configuration.yml'))
+    facade(main, hdx_site='feature', project_config_yaml=join('config', 'project_configuration.yml'))

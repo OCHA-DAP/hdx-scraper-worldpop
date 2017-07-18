@@ -12,6 +12,7 @@ import logging
 
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
+from hdx.data.showcase import Showcase
 from slugify import slugify
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ def get_countriesdata(json_url, downloader):
     return worldpopjson['worldPopData']
 
 
-def generate_dataset(downloader, countrydata):
+def generate_dataset_and_showcase(downloader, countrydata):
     """Parse json of the form:
     {
       "Location": "Zimbabwe",
@@ -57,7 +58,7 @@ def generate_dataset(downloader, countrydata):
       ]
     },
     """
-    title = countrydata['Dataset Title'].replace(' dataset', '')
+    title = countrydata['Dataset Title'].replace('dataset', '').strip()
     logger.info('Creating dataset: %s' % title)
     licence_id = countrydata['License'].lower()
     licence = None
@@ -76,7 +77,7 @@ def generate_dataset(downloader, countrydata):
         'methodology': 'Other',
         'methodology_other': description,
         'dataset_source': countrydata['Source'],
-        'subnational': countrydata['Dataset contains sub-national data'] == True,
+        'subnational': countrydata['Dataset contains sub-national data'] is True,
         'license_id': licence_id,
         'private': countrydata['Visibility'] != 'Public',
         'url': url_summary,
@@ -85,14 +86,16 @@ def generate_dataset(downloader, countrydata):
         'maintainer': countrydata['maintainerName'],
         'maintainer_email': countrydata['maintainerEmail'],
     })
+    location = countrydata['Location']
     try:
         dataset.set_dataset_date(countrydata['datasetDate'])
         dataset.set_expected_update_frequency(countrydata['updateFrequency'])
-        dataset.add_country_location(countrydata['location'])
+        dataset.add_country_location(location)
     except HDXError as e:
         logger.exception('%s has a problem! %s' % (title, e))
-        return None
-    dataset.add_tags(countrydata['tags'])
+        return None, None
+    tags = countrydata['tags']
+    dataset.add_tags(tags)
     if licence:
         dataset.update({'license_other': licence})
 
@@ -106,12 +109,12 @@ def generate_dataset(downloader, countrydata):
     }
     dataset.add_update_resource(resource)
 
-    galleryitem = {
-        'title': 'WorldPop Dataset Summary Page',
-        'type': 'post',
-        'description': '%s Summary Page' % title,
+    showcase = Showcase({
+        'name': '%s-showcase' % slugified_name,
+        'title': 'WorldPop %s Summary Page' % location,
+        'notes': '%s Summary Page' % title,
         'url': url_summary,
         'image_url': countrydata['URL_image']
-    }
-    dataset.add_update_galleryitem(galleryitem)
-    return dataset
+    })
+    showcase.add_tags(tags)
+    return dataset, showcase
