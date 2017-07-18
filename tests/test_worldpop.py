@@ -91,7 +91,7 @@ class TestWorldPop:
         assert showcase == {'image_url': 'http://www.worldpop.org.uk/data/WorldPop_data/AllContinents/ZWE-POP_500.JPG',
                             'name': 'worldpop-zimbabwe-population-showcase',
                             'title': 'WorldPop Zimbabwe Summary Page',
-                            'notes': 'WorldPop Zimbabwe Population Summary Page',
+                            'notes': 'Click the image on the right to go to the WorldPop summary page for the Zimbabwe dataset',
                             'url': 'http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population',
                             'tags': [{'name': 'Population Statistics'}, {'name': 'WorldPop'}, {'name': 'University of Southampton'}]}
 
