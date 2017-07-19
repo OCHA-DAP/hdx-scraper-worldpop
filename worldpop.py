@@ -99,9 +99,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
         'name': title,
         'format': countrydata['fileFormat'],
         'url': countrydata['URL_direct'],
-        'description': description,
-        'url_type': 'api',
-        'resource_type': 'api'
+        'description': description
     }
     dataset.add_update_resource(resource)
 

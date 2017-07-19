@@ -90,8 +90,8 @@ class TestWorldPop:
 
         resources = dataset.get_resources()
         assert resources == [{'description': 'Go to [WorldPop Dataset Summary Page](http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population) for more information',
-                              'resource_type': 'api', 'format': 'zipped geotiff',
-                              'url': 'http://www.worldpop.org.uk/data/hdx/?dataset=ZWE-POP', 'url_type': 'api',
+                              'format': 'zipped geotiff',
+                              'url': 'http://www.worldpop.org.uk/data/hdx/?dataset=ZWE-POP',
                               'name': 'WorldPop Zimbabwe Population'}]
 
         assert showcase == {'image_url': 'http://www.worldpop.org.uk/data/WorldPop_data/AllContinents/ZWE-POP_500.JPG',
