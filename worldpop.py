@@ -13,6 +13,7 @@ import logging
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
+from hdx.utilities.location import Location
 from slugify import slugify
 
 logger = logging.getLogger(__name__)
@@ -86,14 +87,9 @@ def generate_dataset_and_showcase(downloader, countrydata):
         'maintainer': countrydata['maintainerName'],
         'maintainer_email': countrydata['maintainerEmail'],
     })
-    location = countrydata['Location']
-    try:
-        dataset.set_dataset_date(countrydata['datasetDate'])
-        dataset.set_expected_update_frequency(countrydata['updateFrequency'])
-        dataset.add_country_location(location)
-    except HDXError as e:
-        logger.exception('%s has a problem! %s' % (title, e))
-        return None, None
+    dataset.set_dataset_date(countrydata['datasetDate'])
+    dataset.set_expected_update_frequency(countrydata['updateFrequency'])
+    dataset.add_country_location(countrydata['iso3'])
     tags = countrydata['tags']
     dataset.add_tags(tags)
     if licence:
@@ -109,6 +105,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
     }
     dataset.add_update_resource(resource)
 
+    location = countrydata['Location']
     showcase = Showcase({
         'name': '%s-showcase' % slugified_name,
         'title': 'WorldPop %s Summary Page' % location,

@@ -32,7 +32,7 @@ class TestWorldPop:
                    'productionDate': '2013-01-01T00:00:00+00:00',
                    'License': 'Other',
                    'Define License': 'http://www.worldpop.org.uk/data/licence.txt',
-                   'location': 'ZWE',
+                   'iso3': 'ZWE',
                    'maintainerName': 'WorldPop',
                    'Location': 'Zimbabwe',
                    'maintainerEmail': 'worldpop@geodata.soton.ac.uk'}
