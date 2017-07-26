@@ -44,22 +44,22 @@ class TestWorldPop:
 
     @pytest.fixture(scope='function')
     def downloader(self):
-        class Request:
+        class Response:
             def json(self):
                 pass
 
         class Download:
             @staticmethod
             def download(url):
-                request = Request()
+                response = Response()
                 if url == 'http://lala/getJSON/':
                     def fn():
                         return {'worldPopData': [TestWorldPop.countrydata]}
-                    request.json = fn
+                    response.json = fn
                 elif url == 'http://www.worldpop.org.uk/data/licence.txt':
-                    request.text = 'The WorldPop project aims to provide an open access archive of spatial ' \
+                    response.text = 'The WorldPop project aims to provide an open access archive of spatial ' \
                                    'demographic datasets ... at creativecommons.org.'
-                return request
+                return response
         return Download()
 
     def test_get_countriesdata(self, downloader):
