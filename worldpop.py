@@ -81,12 +81,10 @@ def generate_dataset_and_showcase(downloader, countrydata):
         'subnational': countrydata['Dataset contains sub-national data'] is True,
         'license_id': licence_id,
         'private': countrydata['Visibility'] != 'Public',
-        'url': url_summary,
-        'author': countrydata['authorName'],
-        'author_email': countrydata['authorEmail'],
-        'maintainer': countrydata['maintainerName'],
-        'maintainer_email': countrydata['maintainerEmail'],
+        'url': url_summary
     })
+    dataset.set_maintainer('37023db4-a571-4f28-8d1f-15f0353586af')
+    dataset.set_organization('3f077dff-1d05-484d-a7c2-4cb620f22689')
     dataset.set_dataset_date(countrydata['datasetDate'])
     dataset.set_expected_update_frequency(countrydata['updateFrequency'])
     dataset.add_country_location(countrydata['iso3'])

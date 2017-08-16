@@ -72,7 +72,6 @@ class TestWorldPop:
                            'notes': 'These datasets provide estimates of population counts ... information.',
                            'data_update_frequency': '365',
                            'name': 'worldpop-zimbabwe-population',
-                           'author': 'WorldPop',
                            'license_other': 'The WorldPop project aims to provide an open access archive of spatial demographic datasets ... at creativecommons.org.',
                            'license_id': 'hdx-other',
                            'dataset_date': '01/01/2015',
@@ -80,13 +79,12 @@ class TestWorldPop:
                            'tags': [{'name': 'Population Statistics'}, {'name': 'WorldPop'}, {'name': 'University of Southampton'}],
                            'subnational': False,
                            'groups': [{'name': 'zwe'}],
-                           'maintainer': 'WorldPop',
+                           'maintainer': '37023db4-a571-4f28-8d1f-15f0353586af',
+                           'owner_org': '3f077dff-1d05-484d-a7c2-4cb620f22689',
                            'methodology_other': 'Go to [WorldPop Dataset Summary Page](http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population) for more information',
                            'private': False,
                            'methodology': 'Other',
-                           'maintainer_email': 'worldpop@geodata.soton.ac.uk',
-                           'title': 'WorldPop Zimbabwe Population',
-                           'author_email': 'worldpop@geodata.soton.ac.uk'}
+                           'title': 'WorldPop Zimbabwe Population'}
 
         resources = dataset.get_resources()
         assert resources == [{'description': 'Go to [WorldPop Dataset Summary Page](http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population) for more information',
