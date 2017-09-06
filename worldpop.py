@@ -59,7 +59,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
       ]
     },
     """
-    title = countrydata['Dataset Title'].replace('dataset', '').strip()
+    title = '%s - Population' % countrydata['Location']
     logger.info('Creating dataset: %s' % title)
     licence_id = countrydata['License'].lower()
     licence = None
@@ -68,7 +68,8 @@ def generate_dataset_and_showcase(downloader, countrydata):
         licence_url = countrydata['Define License']
         response = downloader.download(licence_url)
         licence = response.text
-    slugified_name = slugify(title).lower()
+    resource_name = countrydata['Dataset Title'].replace('dataset', '').strip()
+    slugified_name = slugify(resource_name).lower()
     url_summary = countrydata['URL_summaryPage']
     description = 'Go to [WorldPop Dataset Summary Page](%s) for more information' % url_summary
     dataset = Dataset({
@@ -94,7 +95,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
         dataset.update({'license_other': licence})
 
     resource = {
-        'name': title,
+        'name': resource_name,
         'format': countrydata['fileFormat'],
         'url': countrydata['URL_direct'],
         'description': description

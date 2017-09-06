@@ -85,7 +85,7 @@ class TestWorldPop:
                            'methodology_other': 'Go to [WorldPop Dataset Summary Page](http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population) for more information',
                            'private': False,
                            'methodology': 'Other',
-                           'title': 'WorldPop Zimbabwe Population'}
+                           'title': 'Zimbabwe - Population'}
 
         resources = dataset.get_resources()
         assert resources == [{'description': 'Go to [WorldPop Dataset Summary Page](http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population) for more information',
