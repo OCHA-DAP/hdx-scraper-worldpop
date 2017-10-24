@@ -20,15 +20,15 @@ def main():
     """Generate dataset and create it in HDX"""
 
     json_url = Configuration.read()['json_url']
-    downloader = Download(basic_auth_file=join(expanduser("~"), '.worldpopkey'))
-    countriesdata = get_countriesdata(json_url, downloader)
-    logger.info('Number of datasets to upload: %d' % len(countriesdata))
-    for countrydata in countriesdata:
-        dataset, showcase = generate_dataset_and_showcase(downloader, countrydata)
-        dataset.update_from_yaml()
-        dataset.create_in_hdx()
-        showcase.create_in_hdx()
-        showcase.add_dataset(dataset)
+    with Download(basic_auth_file=join(expanduser("~"), '.worldpopkey')) as downloader:
+        countriesdata = get_countriesdata(json_url, downloader)
+        logger.info('Number of datasets to upload: %d' % len(countriesdata))
+        for countrydata in countriesdata:
+            dataset, showcase = generate_dataset_and_showcase(downloader, countrydata)
+            dataset.update_from_yaml()
+            dataset.create_in_hdx()
+            showcase.create_in_hdx()
+            showcase.add_dataset(dataset)
 
 if __name__ == '__main__':
     facade(main, hdx_site='feature', project_config_yaml=join('config', 'project_configuration.yml'))
