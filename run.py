@@ -30,7 +30,7 @@ def main():
         for countrydata in sorted(countriesdata, key=lambda x: x['Location']):
             dataset, showcase = generate_dataset_and_showcase(downloader, countrydata)
             dataset.update_from_yaml()
-            dataset.create_in_hdx(hxlupdate=False)
+            dataset.create_in_hdx(hxl_update=False)
             showcase.create_in_hdx()
             showcase.add_dataset(dataset)
 
