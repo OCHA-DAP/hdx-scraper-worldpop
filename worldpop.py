@@ -77,7 +77,6 @@ def generate_dataset_and_showcase(downloader, countrydata):
         'methodology': 'Other',
         'methodology_other': description,
         'dataset_source': countrydata['Source'],
-        'subnational': countrydata['Dataset contains sub-national data'] is True,
         'license_id': licence_id,
         'private': countrydata['Visibility'] != 'Public',
         'url': url_summary
@@ -86,6 +85,7 @@ def generate_dataset_and_showcase(downloader, countrydata):
     dataset.set_organization('3f077dff-1d05-484d-a7c2-4cb620f22689')
     dataset.set_dataset_date(countrydata['datasetDate'])
     dataset.set_expected_update_frequency(countrydata['updateFrequency'])
+    dataset.set_subnational(countrydata['Dataset contains sub-national data'] == 'true')
     dataset.add_country_location(countrydata['iso3'])
     tags = countrydata['tags']
     dataset.add_tags(tags)

@@ -72,6 +72,7 @@ class TestWorldPop:
 
     def test_generate_dataset_and_showcase(self, configuration, downloader):
         dataset, showcase = generate_dataset_and_showcase(downloader, TestWorldPop.countrydata)
+        print(dataset)
         assert dataset == {'dataset_source': 'WorldPop, University of Southampton, UK',
                            'notes': 'These datasets provide estimates of population counts ... information.',
                            'data_update_frequency': '365',
@@ -81,7 +82,7 @@ class TestWorldPop:
                            'dataset_date': '01/01/2015',
                            'url': 'http://www.worldpop.org.uk/data/summary?contselect=Africa&countselect=Zimbabwe&typeselect=Population',
                            'tags': [{'name': 'Population Statistics'}, {'name': 'WorldPop'}, {'name': 'University of Southampton'}],
-                           'subnational': False,
+                           'subnational': '1',
                            'groups': [{'name': 'zwe'}],
                            'maintainer': '37023db4-a571-4f28-8d1f-15f0353586af',
                            'owner_org': '3f077dff-1d05-484d-a7c2-4cb620f22689',
