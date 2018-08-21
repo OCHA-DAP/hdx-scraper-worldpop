@@ -19,12 +19,13 @@ from hdx.facades.hdx_scraperwiki import facade
 
 logger = logging.getLogger(__name__)
 
+lookup = 'hdxscraper-worldpop'
 
 def main():
     """Generate dataset and create it in HDX"""
 
     json_url = Configuration.read()['json_url']
-    with Download(basic_auth_file=join(expanduser("~"), '.worldpopkey')) as downloader:
+    with Download(extra_params_yaml=join(expanduser('~'), '.extraparams.yml'), extra_params_lookup=lookup) as downloader:
         countriesdata = get_countriesdata(json_url, downloader)
         logger.info('Number of datasets to upload: %d' % len(countriesdata))
         for countrydata in sorted(countriesdata, key=lambda x: x['Location']):
@@ -36,4 +37,4 @@ def main():
 
 
 if __name__ == '__main__':
-    facade(main, hdx_site='feature', user_agent_config_yaml=join(expanduser('~'), '.useragents.yml'), user_agent_lookup='hdxscraper-worldpop', project_config_yaml=join('config', 'project_configuration.yml'))
+    facade(main, hdx_site='feature', user_agent_config_yaml=join(expanduser('~'), '.useragents.yml'), user_agent_lookup=lookup, project_config_yaml=join('config', 'project_configuration.yml'))
