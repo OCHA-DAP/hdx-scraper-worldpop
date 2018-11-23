@@ -1,5 +1,5 @@
 ### Collector for WorldPop's Datasets
-[![Build Status](https://travis-ci.org/OCHA-DAP/hdxscraper-worldpop.svg?branch=master&ts=1)](https://travis-ci.org/OCHA-DAP/hdxscraper-worldpop) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdxscraper-worldpop/badge.svg?branch=master&ts=1)](https://coveralls.io/github/OCHA-DAP/hdxscraper-worldpop?branch=master)
+[![Build Status](https://travis-ci.org/OCHA-DAP/hdx-scraper-worldpop.svg?branch=master&ts=1)](https://travis-ci.org/OCHA-DAP/hdx-scraper-worldpop) [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-worldpop/badge.svg?branch=master&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-worldpop?branch=master)
 
 Collector designed to collect WorldPop datasets from the [WorldPop](http://www.worldpop.org/) website.
 
