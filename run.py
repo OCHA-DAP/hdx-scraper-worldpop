@@ -19,7 +19,8 @@ from hdx.facades.hdx_scraperwiki import facade
 
 logger = logging.getLogger(__name__)
 
-lookup = 'hdxscraper-worldpop'
+lookup = 'hdx-scraper-worldpop'
+
 
 def main():
     """Generate dataset and create it in HDX"""
