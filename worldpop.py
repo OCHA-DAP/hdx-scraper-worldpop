@@ -86,7 +86,12 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
     dataset.set_organization('3f077dff-1d05-484d-a7c2-4cb620f22689')
     dataset.set_expected_update_frequency('Every year')
     dataset.set_subnational(True)
-    dataset.add_country_location(iso3)
+    try:
+        dataset.add_country_location(iso3)
+    except HDXError as e:
+        logger.exception('%s has a problem! %s' % (countryname, e))
+        return None, None
+
     tags = [indicator['name']]
     dataset.add_tags(tags)
 
