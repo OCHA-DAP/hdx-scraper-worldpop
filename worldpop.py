@@ -12,6 +12,7 @@ import logging
 import re
 
 from hdx.data.dataset import Dataset
+from hdx.data.hdxobject import HDXError
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from hdx.utilities.dictandlist import dict_of_lists_add
@@ -59,6 +60,9 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
     allmetadata = json['data']
     lastmetadata = allmetadata[-1]
     countryname = Country.get_country_name_from_iso3(iso3)
+    if not countryname:
+        logger.exception('ISO3 %s not recognised!' % iso3)
+        return None, None
     title = '%s - %s' % (countryname, indicator['title'])
     slugified_name = slugify('WorldPop %s %s' % (countryname, indicator['title'])).lower()
     logger.info('Creating dataset: %s' % title)
