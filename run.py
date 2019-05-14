@@ -37,8 +37,6 @@ def main():
 
             logger.info('Number of datasets to upload: %d' % len(iso3s))
             for iso3 in iso3s:
-                if iso3 != 'ZWE':
-                    continue
                 dataset, showcase = generate_dataset_and_showcase(downloader, base_url, indicators[indicator], iso3)
                 dataset.update_from_yaml()
                 dataset.create_in_hdx(remove_additional_resources=True, hxl_update=False)
@@ -47,4 +45,4 @@ def main():
 
 
 if __name__ == '__main__':
-    facade(main, hdx_site='test', user_agent_config_yaml=join(expanduser('~'), '.useragents.yml'), user_agent_lookup=lookup, project_config_yaml=join('config', 'project_configuration.yml'))
+    facade(main, user_agent_config_yaml=join(expanduser('~'), '.useragents.yml'), user_agent_lookup=lookup, project_config_yaml=join('config', 'project_configuration.yml'))
