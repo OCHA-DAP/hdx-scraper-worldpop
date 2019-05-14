@@ -71,12 +71,12 @@ class TestWorldPop:
     def test_get_indicatorsdata(self, downloader):
         indicatorsdata = get_indicatorsdata('http://lala/getJSON/', downloader)
         assert 'pop' in indicatorsdata.keys()
-        assert list(indicatorsdata.values()) == TestWorldPop.indicatorsdata
+        assert sorted(list(indicatorsdata.values()), key=lambda k: k['alias']) == sorted(TestWorldPop.indicatorsdata, key=lambda k: k['alias'])
 
     def test_get_url_iso3s(self, downloader):
         base_url, iso3sdata = get_url_iso3s('http://papa/getJSON/', downloader, 'pop')
         assert base_url == 'http://papa/getJSON/pop/wpgp'
-        assert list(iso3sdata.values()) == TestWorldPop.isosdata
+        assert sorted(list(iso3sdata.values()), key=lambda k: k['id']) == sorted(TestWorldPop.isosdata, key=lambda k: k['id'])
 
     def test_generate_dataset_and_showcase(self, configuration, downloader):
         dataset, showcase = generate_dataset_and_showcase(downloader, 'http://haha/getJSON/pop/wpgp', TestWorldPop.indicatorsdata[0], 'ZWE')
