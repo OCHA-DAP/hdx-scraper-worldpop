@@ -12,9 +12,6 @@ from hdx.utilities.downloader import Download
 
 from worldpop import generate_dataset_and_showcase, get_url_iso3s, get_indicatorsdata
 
-from hdx.facades import logging_kwargs
-logging_kwargs['smtp_config_yaml'] = join('config', 'smtp_configuration.yml')
-
 from hdx.facades.simple import facade
 
 logger = logging.getLogger(__name__)
