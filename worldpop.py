@@ -92,7 +92,7 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
         logger.exception('%s has a problem! %s' % (countryname, e))
         return None, None
 
-    tags = [indicator['name']]
+    tags = [indicator['name'].lower(), 'geodata']
     dataset.add_tags(tags)
 
     earliest_year = 10000

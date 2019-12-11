@@ -7,8 +7,10 @@ Unit tests for worldpop.
 from os.path import join
 
 import pytest
+from hdx.data.vocabulary import Vocabulary
 from hdx.hdx_configuration import Configuration
 from hdx.hdx_locations import Locations
+from hdx.location.country import Country
 
 from worldpop import generate_dataset_and_showcase, get_indicatorsdata, get_url_iso3s
 
@@ -34,6 +36,9 @@ class TestWorldPop:
         Configuration._create(hdx_read_only=True, user_agent='test',
                               project_config_yaml=join('tests', 'config', 'project_configuration.yml'))
         Locations.set_validlocations([{'name': 'zwe', 'title': 'Zimbabwe'}])
+        Country.countriesdata(use_live=False)
+        Vocabulary._tags_dict = True
+        Vocabulary._approved_vocabulary = {'tags': [{'name': 'population'}, {'name': 'geodata'}], 'id': '4e61d464-4943-4e97-973a-84673c1aaa87', 'name': 'approved'}
 
     @pytest.fixture(scope='function')
     def downloader(self):
@@ -88,7 +93,9 @@ class TestWorldPop:
                            'private': False, 'url': 'https://www.worldpop.org/geodata/summary?id=6454',
                            'maintainer': '37023db4-a571-4f28-8d1f-15f0353586af', 'owner_org': '3f077dff-1d05-484d-a7c2-4cb620f22689',
                            'data_update_frequency': '365', 'subnational': '1', 'groups': [{'name': 'zwe'}],
-                           'tags': [{'name': 'Population'}], 'dataset_date': '01/01/2000-12/31/2020'}
+                           'tags': [{'name': 'population', 'vocabulary_id': '4e61d464-4943-4e97-973a-84673c1aaa87'},
+                                    {'name': 'geodata', 'vocabulary_id': '4e61d464-4943-4e97-973a-84673c1aaa87'}],
+                           'dataset_date': '01/01/2000-12/31/2020'}
 
         resources = dataset.get_resources()
         assert resources == [{'name': 'zwe_ppp_2020.tif', 'format': 'Geotiff',
@@ -121,6 +128,7 @@ class TestWorldPop:
                             'notes': 'Takes you to the WorldPop summary page for the Zimbabwe Population dataset',
                             'url': 'https://www.worldpop.org/geodata/summary?id=6454',
                             'image_url': 'https://www.worldpop.org/tabs/gdata/img/6454/zwe_ppp_wpgp_2020_Image.png',
-                            'tags': [{'name': 'Population'}]}
+                            'tags': [{'name': 'population', 'vocabulary_id': '4e61d464-4943-4e97-973a-84673c1aaa87'},
+                                     {'name': 'geodata', 'vocabulary_id': '4e61d464-4943-4e97-973a-84673c1aaa87'}]}
 
 
