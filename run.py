@@ -9,8 +9,9 @@ from os.path import join, expanduser
 
 from hdx.hdx_configuration import Configuration
 from hdx.utilities.downloader import Download
+from hdx.utilities.path import progress_storing_tempdir
 
-from worldpop import generate_dataset_and_showcase, get_url_iso3s, get_indicatorsdata
+from worldpop import generate_datasets_and_showcases, get_indicators_metadata, get_countriesdata
 
 from hdx.facades.simple import facade
 
@@ -23,23 +24,22 @@ def main():
     """Generate dataset and create it in HDX"""
 
     configuration = Configuration.read()
-    indicators_to_process = configuration['indicators']
+    country_indicators = configuration['country_indicators']
+    global_indicators = configuration['global_indicators']
     json_url = configuration['json_url']
     with Download() as downloader:
-        indicators = get_indicatorsdata(json_url, downloader)
-        for indicator in indicators:
-            if indicator not in indicators_to_process:
-                continue
-            base_url, iso3s = get_url_iso3s(json_url, downloader, indicator)
-
-            logger.info('Number of datasets to upload: %d' % len(iso3s))
-            for iso3 in iso3s:
-                dataset, showcase = generate_dataset_and_showcase(downloader, base_url, indicators[indicator], iso3)
-                if dataset is not None:
-                    dataset.update_from_yaml()
-                    dataset.create_in_hdx(remove_additional_resources=True, hxl_update=False)
-                    showcase.create_in_hdx()
-                    showcase.add_dataset(dataset)
+        indicators_metadata = get_indicators_metadata(json_url, downloader, global_indicators, country_indicators)
+        countriesdata, countries = get_countriesdata(json_url, downloader, global_indicators, country_indicators)
+        logger.info('Number of countries to upload: %d' % len(countries))
+        for info, country in progress_storing_tempdir('WorldPop',  countries, 'iso3'):
+            countryiso = country['iso3']
+            datasets, showcases = generate_datasets_and_showcases(downloader, countryiso, indicators_metadata,
+                                                                  countriesdata[countryiso])
+            for i, dataset in enumerate(datasets):
+                dataset.update_from_yaml()
+                dataset.create_in_hdx(remove_additional_resources=True, hxl_update=False, updated_by_script='HDX Scraper: WorldPop', batch=info['batch'])
+                showcases[i].create_in_hdx()
+                showcases[i].add_dataset(dataset)
 
 
 if __name__ == '__main__':

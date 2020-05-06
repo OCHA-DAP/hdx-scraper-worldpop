@@ -21,24 +21,52 @@ from slugify import slugify
 logger = logging.getLogger(__name__)
 
 
-def get_indicatorsdata(json_url, downloader):
+def get_indicators_metadata(json_url, downloader, global_indicators, country_indicators):
     response = downloader.download(json_url)
     json = response.json()
-    return {x['alias']: x for x in json['data']}
+    aliases = list(global_indicators.keys())
+    aliases.extend(country_indicators.keys())
+    indicators_metadata = dict()
+    for indicator_metadata in json['data']:
+        alias = indicator_metadata['alias']
+        if alias not in aliases:
+            continue
+        indicators_metadata[alias] = indicator_metadata
+    return indicators_metadata
 
 
-def get_url_iso3s(json_url, downloader, indicator):
-    base_url = '%s%s' % (json_url, indicator)
-    response = downloader.download(base_url)
-    json = response.json()
-    category = json['data'][-1]['alias']
-    base_url = '%s/%s' % (base_url, category)
-    response = downloader.download(base_url)
-    json = response.json()
-    return base_url, {x['iso3']: x for x in json['data']}
+def get_countriesdata(base_url, downloader, global_indicators, country_indicators):
+
+    def download(alias, lookup):
+        subalias = lookup[alias]
+        url = '%s%s/%s' % (base_url, alias, subalias)
+        response = downloader.download(url)
+        json = response.json()
+        return url, json['data']
+
+    countriesdata = dict()
+    for alias in country_indicators:
+        url, data = download(alias, country_indicators)
+        iso3s = set()
+        for info in data:
+            iso3 = info['iso3']
+            if iso3 in iso3s:
+                continue
+            iso3s.add(iso3)
+            dict_of_lists_add(countriesdata, iso3, {'alias': alias, 'urls': ['%s?iso3=%s' % (url, iso3)]})
+
+    countries = [{'iso3': x} for x in sorted(countriesdata.keys())]
+    for alias in global_indicators:
+        url, data = download(alias, global_indicators)
+        urls = ['%s?id=%s' % (url, x['id']) for x in data]
+        dict_of_lists_add(countriesdata, 'World', {'alias': alias, 'urls': urls})
+    if 'World' in countriesdata:
+        countries.insert(0, {'iso3': 'World'})
+
+    return countriesdata, countries
 
 
-def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
+def generate_dataset_and_showcase(downloader, countryiso, indicator_metadata, aliasinfo):
     """Parse json of the form:
     {'id': '1482', 'title': 'The spatial distribution of population in 2000,
         Zimbabwe', 'desc': 'Estimated total number of people per grid-cell...',  'doi': '10.5258/SOTON/WP00645',
@@ -54,17 +82,26 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
         'license': 'https://www.worldpop.org/data/licence.txt',
         'url_summary': 'https://www.worldpop.org/geodata/summary?id=1482'}
     """
-    json_url = '%s?iso3=%s' % (base_url, iso3)
-    response = downloader.download(json_url)
-    json = response.json()
-    allmetadata = json['data']
+    allmetadata = list()
+    for url in aliasinfo['urls']:
+        response = downloader.download(url)
+        json = response.json()
+        data = json['data']
+        if isinstance(data, list):
+            allmetadata.extend(data)
+        else:
+            allmetadata.append(data)
     lastmetadata = allmetadata[-1]
-    countryname = Country.get_country_name_from_iso3(iso3)
-    if not countryname:
-        logger.exception('ISO3 %s not recognised!' % iso3)
-        return None, None
-    title = '%s - %s' % (countryname, indicator['title'])
-    slugified_name = slugify('WorldPop %s %s' % (countryname, indicator['title'])).lower()
+    indicator_title = indicator_metadata['title']
+    if countryiso == 'World':
+        countryname = countryiso
+    else:
+        countryname = Country.get_country_name_from_iso3(countryiso)
+        if not countryname:
+            logger.exception('ISO3 %s not recognised!' % countryiso)
+            return None, None
+    title = '%s - %s' % (countryname, indicator_title)
+    slugified_name = slugify('WorldPop %s for %s' % (indicator_title, countryname)).lower()
     logger.info('Creating dataset: %s' % title)
     licence_url = lastmetadata['license'].lower()  # suggest that they remove license and rename this field license
     response = downloader.download(licence_url)
@@ -73,7 +110,7 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
     dataset = Dataset({
         'name': slugified_name,
         'title': title,
-        'notes': '%s\n%s' % (indicator['desc'], lastmetadata['citation']),
+        'notes': '%s\n%s' % (indicator_metadata['desc'], lastmetadata['citation']),
         'methodology': 'Other',
         'methodology_other': lastmetadata['desc'],
         'dataset_source': lastmetadata['source'],
@@ -87,18 +124,18 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
     dataset.set_expected_update_frequency('Every year')
     dataset.set_subnational(True)
     try:
-        dataset.add_country_location(iso3)
+        dataset.add_other_location(countryiso)
     except HDXError as e:
         logger.exception('%s has a problem! %s' % (countryname, e))
         return None, None
 
-    tags = [indicator['name'].lower(), 'geodata']
+    tags = [indicator_metadata['name'].lower(), 'geodata']
     dataset.add_tags(tags)
 
     earliest_year = 10000
     latest_year = 0
     resources_dict = dict()
-    for metadata in json['data']:
+    for metadata in allmetadata:
         if metadata['public'].lower() != 'y':
             continue
         year = metadata['popyear']
@@ -131,10 +168,22 @@ def generate_dataset_and_showcase(downloader, base_url, indicator, iso3):
 
     showcase = Showcase({
         'name': '%s-showcase' % slugified_name,
-        'title': 'WorldPop %s %s Summary Page' % (countryname, indicator['title']),
-        'notes': 'Takes you to the WorldPop summary page for the %s %s dataset' % (countryname, indicator['title']),
+        'title': 'WorldPop %s %s Summary Page' % (countryname, indicator_title),
+        'notes': 'Takes you to the WorldPop summary page for the %s %s dataset' % (countryname, indicator_title),
         'url': url_summary,
         'image_url': lastmetadata['url_img']
     })
     showcase.add_tags(tags)
     return dataset, showcase
+
+
+def generate_datasets_and_showcases(downloader, countryiso, indicators_metadata, countrydata):
+    datasets = list()
+    showcases = list()
+    for aliasinfo in countrydata:
+        dataset, showcase = generate_dataset_and_showcase(downloader, countryiso,
+                                                          indicators_metadata[aliasinfo['alias']], aliasinfo)
+        if dataset:
+            datasets.append(dataset)
+            showcases.append(showcase)
+    return datasets, showcases
