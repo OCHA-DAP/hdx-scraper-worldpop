@@ -1,8 +1,10 @@
 # Collector specific configuration
 json_url: "https://www.worldpop.org/rest/data/"
-indicators:
-  - "pop"
-  - "births"
-  - "pregnancies"
-  - "age_structures"
-
+country_indicators:
+  pop: "wpgp"
+  births: "bic"
+  pregnancies: "individual_countries"
+  age_structures: "aswpgp"
+global_indicators:
+  pop: "wpgp1km"
+  age_structures: "aswpgponekm"

@@ -1,3 +1,10 @@
 # Collector specific configuration
-json_url: "http://www.worldpop.org.uk/getJSON/"
-
+json_url: "https://xxx/"
+country_indicators:
+  pop: "wpgp"
+  births: "bic"
+  pregnancies: "individual_countries"
+  age_structures: "aswpgp"
+global_indicators:
+  pop: "wpgp1km"
+  age_structures: "aswpgponekm"
