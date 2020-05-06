@@ -160,6 +160,9 @@ def generate_dataset_and_showcase(downloader, countryiso, indicator_metadata, al
                 'description': description
             }
             dict_of_lists_add(resources_dict, year, resource)
+    if not resources_dict:
+        logger.error('%s has no data!' % title)
+        return None, None
     for year in sorted(resources_dict.keys(), reverse=True):
         for resource in resources_dict[year]:
             dataset.add_update_resource(resource)
