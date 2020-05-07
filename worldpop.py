@@ -151,7 +151,9 @@ def generate_dataset_and_showcase(downloader, countryiso, indicator_metadata, al
             description = metadata['title']
             if not re.match(r'.*([1-3][0-9]{3})', resource_name):
                 resource_parts = resource_name.split('.')
-                resource_name = '%s_%s.%s' % (resource_parts[0], year, resource_parts[1])
+                resource_name = '%s_%s' % (resource_parts[0], year)
+                if len(resource_parts) >= 2:
+                    resource_name = '%s.%s' % (resource_name, resource_parts[1])
                 description = '%s in %s' % (description, year)
             resource = {
                 'name': resource_name,
