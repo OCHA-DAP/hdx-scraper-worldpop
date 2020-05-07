@@ -169,6 +169,14 @@ def generate_dataset_and_showcase(downloader, countryiso, indicator_metadata, al
 
     dataset.set_dataset_year_range(earliest_year, latest_year)
 
+    url_img = lastmetadata['url_img']
+    if not url_img:
+        for lastmetadata in reversed(allmetadata[:-1]):
+            url_img = lastmetadata['url_img']
+            if url_img:
+                break
+    if not url_img:
+        return dataset, None
     showcase = Showcase({
         'name': '%s-showcase' % slugified_name,
         'title': 'WorldPop %s %s Summary Page' % (countryname, indicator_title),

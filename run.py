@@ -38,8 +38,11 @@ def main():
             for i, dataset in enumerate(datasets):
                 dataset.update_from_yaml()
                 dataset.create_in_hdx(remove_additional_resources=True, hxl_update=False, updated_by_script='HDX Scraper: WorldPop', batch=info['batch'])
-                showcases[i].create_in_hdx()
-                showcases[i].add_dataset(dataset)
+                showcase = showcases[i]
+                if not showcase:
+                    continue
+                showcase.create_in_hdx()
+                showcase.add_dataset(dataset)
 
 
 if __name__ == '__main__':
