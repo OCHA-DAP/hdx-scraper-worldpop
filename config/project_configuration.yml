@@ -5,7 +5,15 @@ indicators:
     country:
       - "wpgp"
       - "wpgpunadj"
+      - "cic2020_100m"
+      - "cic2020_UNadj_100m"
+      - "wpic1km"
+      - "wpicuadj1km"
     global: "wpgp1km"
+  pop_density:
+    country:
+      - "pd_ic_1km"
+      - "pd_ic_1km_unadj"
   births:
     country:
       - "bic"
