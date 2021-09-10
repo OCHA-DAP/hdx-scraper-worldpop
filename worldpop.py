@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 WORLDPOP:
 ------------
@@ -23,12 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 def get_indicators_metadata(json_url, downloader, indicators):
-    response = downloader.download(json_url)
-    json = response.json()
+    downloader.download(json_url)
+    json = downloader.get_json()
     aliases = list(indicators.keys())
     indicators_metadata = dict()
-    for indicator_metadata in json['data']:
-        alias = indicator_metadata['alias']
+    for indicator_metadata in json["data"]:
+        alias = indicator_metadata["alias"]
         if alias not in aliases:
             continue
         indicators_metadata[alias] = indicator_metadata
@@ -36,46 +35,47 @@ def get_indicators_metadata(json_url, downloader, indicators):
 
 
 def get_countriesdata(base_url, downloader, indicators):
-
     def download(alias, subalias):
-        url = '%s%s/%s' % (base_url, alias, subalias)
-        response = downloader.download(url)
-        json = response.json()
+        url = f"{base_url}{alias}/{subalias}"
+        downloader.download(url)
+        json = downloader.get_json()
 
-        return url, json['data']
+        return url, json["data"]
 
     countriesdata = dict()
 
     for alias in indicators:
         indicators_alias = indicators[alias]
-        for subalias in indicators_alias.get('country', list()):
+        for subalias in indicators_alias.get("country", list()):
             url, data = download(alias, subalias)
             iso3s = set()
             for info in data:
-                iso3 = info['iso3']
+                iso3 = info["iso3"]
                 if iso3 in iso3s:
                     continue
                 iso3s.add(iso3)
                 countrydata = countriesdata.get(iso3, dict())
                 countryalias = countrydata.get(alias, dict())
-                dict_of_lists_add(countryalias, subalias, '%s?iso3=%s' % (url, iso3))
+                dict_of_lists_add(countryalias, subalias, f"{url}?iso3={iso3}")
                 countrydata[alias] = countryalias
                 countriesdata[iso3] = countrydata
-        subalias = indicators_alias.get('global')
+        subalias = indicators_alias.get("global")
         if subalias:
             url, data = download(alias, subalias)
-            countrydata = countriesdata.get('World', dict())
+            countrydata = countriesdata.get("World", dict())
             countryalias = countrydata.get(alias, dict())
-            countryalias[subalias] = ['%s?id=%s' % (url, x['id']) for x in data]
+            countryalias[subalias] = [f"{url}?id={x['id']}" for x in data]
             countrydata[alias] = countryalias
-            countriesdata['World'] = countrydata
+            countriesdata["World"] = countrydata
 
-    countries = [{'iso3': x} for x in sorted(countriesdata.keys()) if x != 'World']
-    countries.append({'iso3': 'World'})
+    countries = [{"iso3": x} for x in sorted(countriesdata.keys()) if x != "World"]
+    countries.append({"iso3": "World"})
     return countriesdata, countries
 
 
-def generate_dataset_and_showcases(downloader, countryiso, indicator_metadata, countryalias):
+def generate_dataset_and_showcases(
+    downloader, countryiso, indicator_metadata, countryalias
+):
     """Parse json of the form:
     {'id': '1482', 'title': 'The spatial distribution of population in 2000,
         Zimbabwe', 'desc': 'Estimated total number of people per grid-cell...',  'doi': '10.5258/SOTON/WP00645',
@@ -96,9 +96,9 @@ def generate_dataset_and_showcases(downloader, countryiso, indicator_metadata, c
         urls = countryalias[subalias]
         allmetadata_subalias = allmetadata.get(subalias, list())
         for url in urls:
-            response = downloader.download(url)
-            json = response.json()
-            data = json['data']
+            downloader.download(url)
+            json = downloader.get_json()
+            data = json["data"]
             if isinstance(data, list):
                 allmetadata_subalias.extend(data)
             else:
@@ -106,55 +106,59 @@ def generate_dataset_and_showcases(downloader, countryiso, indicator_metadata, c
         allmetadata[subalias] = allmetadata_subalias
     allmetadatavalues = list(allmetadata.values())
     lastmetadata = allmetadatavalues[0][-1]
-    indicator_title = indicator_metadata['title']
-    if countryiso == 'World':
+    indicator_title = indicator_metadata["title"]
+    if countryiso == "World":
         countryname = countryiso
     else:
         countryname = Country.get_country_name_from_iso3(countryiso)
         if not countryname:
-            logger.exception('ISO3 %s not recognised!' % countryiso)
+            logger.exception(f"ISO3 {countryiso} not recognised!")
             return None, None
-    title = '%s - %s' % (countryname, indicator_title)
-    slugified_name = slugify('WorldPop %s for %s' % (indicator_title, countryname)).lower()
-    logger.info('Creating dataset: %s' % title)
-    licence_url = lastmetadata['license'].lower()  # suggest that they remove license and rename this field license
-    response = downloader.download(licence_url)
-    licence = response.text
+    title = f"{countryname} - {indicator_title}"
+    slugified_name = slugify(f"WorldPop {indicator_title} for {countryname}").lower()
+    logger.info(f"Creating dataset: {title}")
+    licence_url = lastmetadata[
+        "license"
+    ].lower()  # suggest that they remove license and rename this field license
+    downloader.download(licence_url)
+    licence = downloader.get_text()
     methodologies = list()
     url_imgs = list()
     for allmetadatavalue in allmetadatavalues:
         lastallmetadatavalue = allmetadatavalue[-1]
-        methodologies.append(lastallmetadatavalue['desc'])
-        url_img = lastallmetadatavalue['url_img']
+        methodologies.append(lastallmetadatavalue["desc"])
+        url_img = lastallmetadatavalue["url_img"]
         if not url_img:
             for lastallmetadatavalue in reversed(allmetadatavalue[:-1]):
-                url_img = lastallmetadatavalue['url_img']
+                url_img = lastallmetadatavalue["url_img"]
                 if url_img:
                     break
         url_imgs.append(url_img)
     methodology = get_matching_then_nonmatching_text(methodologies)
-    dataset = Dataset({
-        'name': slugified_name,
-        'title': title,
-        'notes': '%s\n%s' % (indicator_metadata['desc'], lastmetadata['citation']),
-        'methodology': 'Other',
-        'methodology_other': methodology,
-        'dataset_source': lastmetadata['source'],
-        'license_id': 'hdx-other',
-        'license_other': licence,
-        'private': False
-    })
-    dataset.set_maintainer('37023db4-a571-4f28-8d1f-15f0353586af')
-    dataset.set_organization('3f077dff-1d05-484d-a7c2-4cb620f22689')
-    dataset.set_expected_update_frequency('Every year')
+    dataset = Dataset(
+        {
+            "name": slugified_name,
+            "title": title,
+            "notes": f"{indicator_metadata['desc']}\n{lastmetadata['citation']}",
+            "methodology": "Other",
+            "methodology_other": methodology,
+            "dataset_source": lastmetadata["source"],
+            "license_id": "hdx-other",
+            "license_other": licence,
+            "private": False,
+        }
+    )
+    dataset.set_maintainer("37023db4-a571-4f28-8d1f-15f0353586af")
+    dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
+    dataset.set_expected_update_frequency("Every year")
     dataset.set_subnational(True)
     try:
         dataset.add_other_location(countryiso)
     except HDXError as e:
-        logger.exception('%s has a problem! %s' % (countryname, e))
+        logger.exception(f"{countryname} has a problem! {e}")
         return None, None
 
-    tags = [indicator_metadata['name'].lower(), 'geodata']
+    tags = [indicator_metadata["name"].lower(), "geodata"]
     dataset.add_tags(tags)
 
     earliest_year = 10000
@@ -162,34 +166,34 @@ def generate_dataset_and_showcases(downloader, countryiso, indicator_metadata, c
     resources_dict = dict()
     for subalias in allmetadata:
         for metadata in allmetadata[subalias]:
-            if metadata['public'].lower() != 'y':
+            if metadata["public"].lower() != "y":
                 continue
-            year = metadata['popyear']
+            year = metadata["popyear"]
             if not year:
-                year = metadata['date'][:4]
+                year = metadata["date"][:4]
             year = int(year)
             if year > latest_year:
                 latest_year = year
             if year < earliest_year:
                 earliest_year = year
-            for url in sorted(metadata['files'], reverse=True):
-                resource_name = url[url.rfind('/')+1:]
-                description = metadata['title']
-                if not re.match(r'.*([1-3][0-9]{3})', resource_name):
-                    resource_parts = resource_name.split('.')
-                    resource_name = '%s_%s' % (resource_parts[0], year)
+            for url in sorted(metadata["files"], reverse=True):
+                resource_name = url[url.rfind("/") + 1 :]
+                description = metadata["title"]
+                if not re.match(r".*([1-3][0-9]{3})", resource_name):
+                    resource_parts = resource_name.split(".")
+                    resource_name = f"{resource_parts[0]}_{year}"
                     if len(resource_parts) >= 2:
-                        resource_name = '%s.%s' % (resource_name, resource_parts[1])
-                    description = '%s in %s' % (description, year)
+                        resource_name = f"{resource_name}.{resource_parts[1]}"
+                    description = f"{description} in {year}"
                 resource = {
-                    'name': resource_name,
-                    'format': metadata['data_format'],
-                    'url': url,
-                    'description': description
+                    "name": resource_name,
+                    "format": metadata["data_format"],
+                    "url": url,
+                    "description": description,
                 }
                 dict_of_lists_add(resources_dict, year, resource)
     if not resources_dict:
-        logger.error('%s has no data!' % title)
+        logger.error(f"{title} has no data!")
         return None, None
     for year in sorted(resources_dict.keys(), reverse=True):
         for resource in resources_dict[year]:
@@ -202,31 +206,37 @@ def generate_dataset_and_showcases(downloader, countryiso, indicator_metadata, c
         if not url_img:
             continue
         allmetadatavalue = allmetadatavalues[i][-1]
-        url_summary = allmetadatavalue['url_summary']
+        url_summary = allmetadatavalue["url_summary"]
         if i == 0:
-            name = '%s-showcase' % slugified_name
+            name = f"{slugified_name}-showcase"
         else:
-            name = '%s-%d-showcase' % (slugified_name, i + 1)
-        showcase = Showcase({
-            'name': name,
-            'title': 'WorldPop %s %s Summary Page' % (countryname, indicator_title),
-            'notes': 'Summary for %s - %s' % (allmetadatavalue['category'], countryname),
-            'url': url_summary,
-            'image_url': url_img})
+            name = f"{slugified_name}-{i + 1}-showcase"
+        showcase = Showcase(
+            {
+                "name": name,
+                "title": f"WorldPop {countryname} {indicator_title} Summary Page",
+                "notes": f"Summary for {allmetadatavalue['category']} - {countryname}",
+                "url": url_summary,
+                "image_url": url_img,
+            }
+        )
         showcase.add_tags(tags)
         showcases.append(showcase)
     return dataset, showcases
 
 
-def generate_datasets_and_showcases(downloader, countryiso, indicators_metadata, countrydata):
+def generate_datasets_and_showcases(
+    downloader, countryiso, indicators_metadata, countrydata
+):
     datasets = list()
     showcases = dict()
     for alias in countrydata:
-        dataset, d_showcases = generate_dataset_and_showcases(downloader, countryiso,
-                                                              indicators_metadata[alias], countrydata[alias])
+        dataset, d_showcases = generate_dataset_and_showcases(
+            downloader, countryiso, indicators_metadata[alias], countrydata[alias]
+        )
         if dataset:
             datasets.append(dataset)
-            dataset_name = dataset['name']
+            dataset_name = dataset["name"]
             dataset_showcases = showcases.get(dataset_name, list())
             dataset_showcases.extend(d_showcases)
             showcases[dataset_name] = dataset_showcases
