@@ -7,6 +7,7 @@ import logging
 from os.path import expanduser, join
 from time import sleep
 
+from hdx.data.hdxobject import HDXError
 from hdx.facades.simple import facade
 from hdx.hdx_configuration import Configuration
 from hdx.utilities.downloader import Download, DownloadError
@@ -58,7 +59,7 @@ def main():
                             showcase.create_in_hdx()
                             showcase.add_dataset(dataset)
                 break
-            except DownloadError:
+            except (DownloadError, HDXError):
                 if cur_country == prev_country:
                     raise
                 prev_country = cur_country
