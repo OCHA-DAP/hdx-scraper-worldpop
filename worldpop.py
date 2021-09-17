@@ -139,7 +139,7 @@ def generate_dataset_and_showcases(
         {
             "name": slugified_name,
             "title": title,
-            "notes": f"{indicator_metadata['desc']}  \nData for earlier dates is available directly from WorldPop.  \n{lastmetadata['citation']}",
+            "notes": f"{indicator_metadata['desc']}  \nData for earlier dates is available directly from WorldPop.  \n  \n{lastmetadata['citation']}",
             "methodology": "Other",
             "methodology_other": methodology,
             "dataset_source": lastmetadata["source"],
