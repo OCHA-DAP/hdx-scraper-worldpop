@@ -1,1 +1,0 @@
-# WorldPop has no additional requirements to the base image

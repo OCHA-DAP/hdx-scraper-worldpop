@@ -12,6 +12,7 @@ from hdx.facades.simple import facade
 from hdx.hdx_configuration import Configuration
 from hdx.utilities.downloader import Download, DownloadError
 from hdx.utilities.path import progress_storing_tempdir
+from retry import retry
 
 from worldpop import (
     generate_datasets_and_showcases,
@@ -34,42 +35,23 @@ def main():
         indicators_metadata = get_indicators_metadata(json_url, downloader, indicators)
         countriesdata, countries = get_countriesdata(json_url, downloader, indicators)
         logger.info(f"Number of countries to upload: {len(countries)}")
-        tries = 0
-        ex = None
-        cur_country = None
-        prev_country = None
-        while tries < 5:
-            ex = None
-            try:
-                for info, country in progress_storing_tempdir("WorldPop", countries, "iso3"):
-                    cur_country = country
-                    countryiso = country["iso3"]
-                    datasets, showcases = generate_datasets_and_showcases(
-                        downloader, countryiso, indicators_metadata, countriesdata[countryiso]
-                    )
-                    for dataset in datasets:
-                        dataset.update_from_yaml()
-                        dataset.create_in_hdx(
-                            remove_additional_resources=True,
-                            hxl_update=False,
-                            updated_by_script="HDX Scraper: WorldPop",
-                            batch=info["batch"],
-                        )
-                        for showcase in showcases.get(dataset["name"], list()):
-                            showcase.create_in_hdx()
-                            showcase.add_dataset(dataset)
-                break
-            except (DownloadError, HDXError) as ex:
-                if cur_country == prev_country:
-                    raise
-                prev_country = cur_country
-                tries += 1
-                logger.warning(
-                    f"Download failed! Trying again in an hour. Try = {tries}"
+
+        for info, country in progress_storing_tempdir("WorldPop", countries, "iso3"):
+            countryiso = country["iso3"]
+            datasets, showcases = generate_datasets_and_showcases(
+                downloader, countryiso, indicators_metadata, countriesdata[countryiso]
+            )
+            for dataset in datasets:
+                dataset.update_from_yaml()
+                dataset.create_in_hdx(
+                    remove_additional_resources=True,
+                    hxl_update=False,
+                    updated_by_script="HDX Scraper: WorldPop",
+                    batch=info["batch"],
                 )
-                sleep(3600)
-        if ex is not None:
-            raise
+                for showcase in showcases.get(dataset["name"], list()):
+                    showcase.create_in_hdx()
+                    showcase.add_dataset(dataset)
 
 
 if __name__ == "__main__":

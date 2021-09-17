@@ -139,7 +139,7 @@ def generate_dataset_and_showcases(
         {
             "name": slugified_name,
             "title": title,
-            "notes": f"{indicator_metadata['desc']}\n{lastmetadata['citation']}",
+            "notes": f"{indicator_metadata['desc']}\nData for earlier dates is available directly from WorldPop.\n{lastmetadata['citation']}",
             "methodology": "Other",
             "methodology_other": methodology,
             "dataset_source": lastmetadata["source"],
@@ -195,7 +195,7 @@ def generate_dataset_and_showcases(
     if not resources_dict:
         logger.error(f"{title} has no data!")
         return None, None
-    for year in sorted(resources_dict.keys(), reverse=True):
+    for year in sorted(resources_dict.keys(), reverse=True)[:5]:  # Just get last 5 years of data
         for resource in resources_dict[year]:
             dataset.add_update_resource(resource)
 

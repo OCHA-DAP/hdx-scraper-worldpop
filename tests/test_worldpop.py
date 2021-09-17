@@ -813,23 +813,7 @@ class TestWorldPop:
                 "description": "The spatial distribution of population in 2001 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
                 "url_type": "api",
-            },
-            {
-                "name": "zwe_ppp_2000.tif",
-                "format": "geotiff",
-                "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2000/ZWE/zwe_ppp_2000.tif",
-                "description": "The spatial distribution of population in 2000, Zimbabwe",
-                "resource_type": "api",
-                "url_type": "api",
-            },
-            {
-                "name": "zwe_ppp_2000_UNadj.tif",
-                "format": "geotiff",
-                "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2000/ZWE/zwe_ppp_2000_UNadj.tif",
-                "description": "The spatial distribution of population in 2000 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
-                "resource_type": "api",
-                "url_type": "api",
-            },
+            }
         ]
 
         showcase = next(iter(showcases.values()))[0]
