@@ -634,7 +634,7 @@ class TestWorldPop:
         assert dataset == {
             "name": "worldpop-population-for-world",
             "title": "World - Population",
-            "notes": "WorldPop produces different types of gridded population count datasets...\nData for earlier dates is available directly from WorldPop.\nWorldPop...\r\n",
+            "notes": "WorldPop produces different types of gridded population count datasets...\r\nData for earlier dates is available directly from WorldPop.\r\nWorldPop...\r\n",
             "methodology": "Other",
             "methodology_other": "Estimated total number of people per grid-cell...\r\n",
             "dataset_source": "WorldPop, University of Southampton, UK",
@@ -707,7 +707,7 @@ class TestWorldPop:
         assert dataset == {
             "name": "worldpop-population-for-zimbabwe",
             "title": "Zimbabwe - Population",
-            "notes": "WorldPop produces different types of gridded population count datasets...\nData for earlier dates is available directly from WorldPop.\nWorldPop",
+            "notes": "WorldPop produces different types of gridded population count datasets...\r\nData for earlier dates is available directly from WorldPop.\r\nWorldPop",
             "methodology": "Other",
             "methodology_other": "Estimated total number of people per grid-cell. UNAdj",
             "dataset_source": "WorldPop, University of Southampton, UK",
