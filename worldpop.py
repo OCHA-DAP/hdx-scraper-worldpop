@@ -199,7 +199,7 @@ def generate_dataset_and_showcases(
         for resource in resources_dict[year]:
             dataset.add_update_resource(resource)
 
-    dataset.set_dataset_year_range(earliest_year, latest_year)
+    dataset.set_reference_period_year_range(earliest_year, latest_year)
 
     showcases = list()
     for i, url_img in enumerate(url_imgs):

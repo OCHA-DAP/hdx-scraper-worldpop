@@ -7,8 +7,8 @@ from os.path import join
 
 import pytest
 from hdx.data.vocabulary import Vocabulary
-from hdx.hdx_configuration import Configuration
-from hdx.hdx_locations import Locations
+from hdx.api.configuration import Configuration
+from hdx.api.locations import Locations
 from hdx.location.country import Country
 
 from worldpop import (
@@ -552,7 +552,7 @@ class TestWorldPop:
             [{"name": "zwe", "title": "Zimbabwe"}, {"name": "world", "title": "World"}]
         )
         Country.countriesdata(use_live=False)
-        Vocabulary._tags_dict = True
+        Vocabulary._tags_dict = {}
         Vocabulary._approved_vocabulary = {
             "tags": [{"name": "population"}, {"name": "geodata"}],
             "id": "4e61d464-4943-4e97-973a-84673c1aaa87",
@@ -656,7 +656,7 @@ class TestWorldPop:
                     "vocabulary_id": "4e61d464-4943-4e97-973a-84673c1aaa87",
                 },
             ],
-            "dataset_date": "[2019-01-01T00:00:00 TO 2020-12-31T00:00:00]",
+            "dataset_date": "[2019-01-01T00:00:00 TO 2020-12-31T23:59:59]",
         }
 
         resources = dataset.get_resources()
@@ -729,7 +729,7 @@ class TestWorldPop:
                     "vocabulary_id": "4e61d464-4943-4e97-973a-84673c1aaa87",
                 },
             ],
-            "dataset_date": "[2000-01-01T00:00:00 TO 2020-12-31T00:00:00]",
+            "dataset_date": "[2000-01-01T00:00:00 TO 2020-12-31T23:59:59]",
         }
 
         resources = dataset.get_resources()
