@@ -12,6 +12,7 @@ import re
 
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
+from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
 from hdx.utilities.dictandlist import dict_of_lists_add
@@ -196,7 +197,9 @@ def generate_dataset_and_showcases(
         logger.error(f"{title} has no data!")
         return None, None
     for year in sorted(resources_dict.keys(), reverse=True)[:5]:  # Just get last 5 years of data
-        for resource in resources_dict[year]:
+        for resource_dict in resources_dict[year]:
+            resource = Resource(resource_dict)
+            resource.mark_data_updated()
             dataset.add_update_resource(resource)
 
     dataset.set_reference_period_year_range(earliest_year, latest_year)
