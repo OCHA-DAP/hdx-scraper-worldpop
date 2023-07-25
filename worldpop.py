@@ -169,9 +169,10 @@ def generate_dataset_and_showcases(
         for metadata in allmetadata[subalias]:
             if metadata["public"].lower() != "y":
                 continue
+            date = metadata["date"]
             year = metadata["popyear"]
             if not year:
-                year = metadata["date"][:4]
+                year = date[:4]
             year = int(year)
             if year > latest_year:
                 latest_year = year
@@ -186,20 +187,23 @@ def generate_dataset_and_showcases(
                     if len(resource_parts) >= 2:
                         resource_name = f"{resource_name}.{resource_parts[1]}"
                     description = f"{description} in {year}"
-                resource = {
-                    "name": resource_name,
-                    "format": metadata["data_format"],
-                    "url": url,
-                    "description": description,
-                }
+                resource = Resource(
+                    {
+                        "name": resource_name,
+                        "format": metadata["data_format"],
+                        "url": url,
+                        "description": description,
+                    }
+                )
+                resource.set_date_data_updated(date)
                 dict_of_lists_add(resources_dict, year, resource)
     if not resources_dict:
         logger.error(f"{title} has no data!")
         return None, None
-    for year in sorted(resources_dict.keys(), reverse=True)[:5]:  # Just get last 5 years of data
-        for resource_dict in resources_dict[year]:
-            resource = Resource(resource_dict)
-            resource.mark_data_updated()
+    for year in sorted(resources_dict.keys(), reverse=True)[
+        :5
+    ]:  # Just get last 5 years of data
+        for resource in resources_dict[year]:
             dataset.add_update_resource(resource)
 
     dataset.set_reference_period_year_range(earliest_year, latest_year)
