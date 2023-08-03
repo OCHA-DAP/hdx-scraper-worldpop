@@ -663,7 +663,7 @@ class TestWorldPop:
             {
                 "name": "ppp_2020_1km_Aggregated.tif",
                 "format": "geotiff",
-                "last_modified": "2018-02-01T00:00:00",
+                "last_modified": "2018-02-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2020/0_Mosaicked/ppp_2020_1km_Aggregated.tif",
                 "description": "The spatial distribution of population in 2020",
                 "resource_type": "api",
@@ -672,7 +672,7 @@ class TestWorldPop:
             {
                 "name": "ppp_2019_1km_Aggregated.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2019/0_Mosaicked/ppp_2019_1km_Aggregated.tif",
                 "description": "The spatial distribution of population in 2019",
                 "resource_type": "api",
@@ -738,7 +738,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2020.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2020/ZWE/zwe_ppp_2020.tif",
                 "description": "The spatial distribution of population in 2020, Zimbabwe",
                 "resource_type": "api",
@@ -747,7 +747,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2020_UNadj.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2020/ZWE/zwe_ppp_2020_UNadj.tif",
                 "description": "The spatial distribution of population in 2020 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
@@ -756,7 +756,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2019.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2019/ZWE/zwe_ppp_2019.tif",
                 "description": "The spatial distribution of population in 2019, Zimbabwe",
                 "resource_type": "api",
@@ -765,7 +765,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2019_UNadj.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2019/ZWE/zwe_ppp_2019_UNadj.tif",
                 "description": "The spatial distribution of population in 2019 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
@@ -774,7 +774,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2013.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2013/ZWE/zwe_ppp_2013.tif",
                 "description": "The spatial distribution of population in 2013, Zimbabwe",
                 "resource_type": "api",
@@ -783,7 +783,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2013_UNadj.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2013/ZWE/zwe_ppp_2013_UNadj.tif",
                 "description": "The spatial distribution of population in 2013 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
@@ -792,7 +792,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2008.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2008/ZWE/zwe_ppp_2008.tif",
                 "description": "The spatial distribution of population in 2008, Zimbabwe",
                 "resource_type": "api",
@@ -801,7 +801,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2008_UNadj.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2008/ZWE/zwe_ppp_2008_UNadj.tif",
                 "description": "The spatial distribution of population in 2008 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
@@ -810,7 +810,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2001.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2001/ZWE/zwe_ppp_2001.tif",
                 "description": "The spatial distribution of population in 2001, Zimbabwe",
                 "resource_type": "api",
@@ -819,7 +819,7 @@ class TestWorldPop:
             {
                 "name": "zwe_ppp_2001_UNadj.tif",
                 "format": "geotiff",
-                "last_modified": "2018-11-01T00:00:00",
+                "last_modified": "2018-11-01T00:00:00.000000",
                 "url": "ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2001/ZWE/zwe_ppp_2001_UNadj.tif",
                 "description": "The spatial distribution of population in 2001 with country total adjusted to match the corresponding UNPD estimate, Zimbabwe",
                 "resource_type": "api",
