@@ -10,11 +10,13 @@ Reads WorldPop JSON and creates datasets.
 import logging
 import re
 
+from dateutil.parser import ParserError
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
 from hdx.location.country import Country
+from hdx.utilities.dateparse import default_enddate, parse_date
 from hdx.utilities.dictandlist import dict_of_lists_add
 from hdx.utilities.text import get_matching_then_nonmatching_text
 from slugify import slugify
@@ -162,6 +164,7 @@ def generate_dataset_and_showcases(
     tags = [indicator_metadata["name"].lower(), "geodata"]
     dataset.add_tags(tags)
 
+    earliest_date = default_enddate
     earliest_year = 10000
     latest_year = 0
     resources_dict = dict()
@@ -169,10 +172,17 @@ def generate_dataset_and_showcases(
         for metadata in allmetadata[subalias]:
             if metadata["public"].lower() != "y":
                 continue
-            date = metadata["date"]
+            try:
+                date = parse_date(metadata["date"], timezone_handling=3, include_microseconds=True)
+                if date.year < 2000:
+                    date = earliest_date
+                elif date < earliest_date:
+                    earliest_date = date
+            except ParserError:
+                date = earliest_date
             year = metadata["popyear"]
             if not year:
-                year = date[:4]
+                year = date.year
             year = int(year)
             if year > latest_year:
                 latest_year = year
