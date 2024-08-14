@@ -545,7 +545,7 @@ class TestWorldPop:
         Configuration._create(
             hdx_read_only=True,
             user_agent="test",
-            project_config_yaml=join("tests", "config", "project_configuration.yml"),
+            project_config_yaml=join("tests", "config", "project_configuration.yaml"),
         )
         Locations.set_validlocations(
             [{"name": "zwe", "title": "Zimbabwe"}, {"name": "world", "title": "World"}]
