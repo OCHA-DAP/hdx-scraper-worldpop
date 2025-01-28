@@ -30,17 +30,18 @@ class WorldPop:
         self._retriever = retriever
         self._json_url = configuration["json_url"]
         self._indicators = configuration["indicators"]
+        self._indicators_metadata = {}
+        self._countriesdata = {}
 
     def get_indicators_metadata(self):
         json = self._retriever.download_json(self._json_url)
         aliases = list(self._indicators.keys())
-        indicators_metadata = {}
         for indicator_metadata in json["data"]:
             alias = indicator_metadata["alias"]
             if alias not in aliases:
                 continue
-            indicators_metadata[alias] = indicator_metadata
-        return indicators_metadata
+            self._indicators_metadata[alias] = indicator_metadata
+        return self._indicators_metadata
 
 
     def get_countriesdata(self):
@@ -49,8 +50,6 @@ class WorldPop:
             json = self._retriever.download_json(url)
 
             return url, json["data"]
-
-        countriesdata = {}
 
         for alias in self._indicators:
             indicators_alias = self._indicators[alias]
@@ -62,23 +61,23 @@ class WorldPop:
                     if iso3 in iso3s:
                         continue
                     iso3s.add(iso3)
-                    countrydata = countriesdata.get(iso3, {})
+                    countrydata = self._countriesdata.get(iso3, {})
                     countryalias = countrydata.get(alias, {})
                     dict_of_lists_add(countryalias, subalias, f"{url}?iso3={iso3}")
                     countrydata[alias] = countryalias
-                    countriesdata[iso3] = countrydata
+                    self._countriesdata[iso3] = countrydata
             subalias = indicators_alias.get("global")
             if subalias:
                 url, data = download(alias, subalias)
-                countrydata = countriesdata.get("World", {})
+                countrydata = self._countriesdata.get("World", {})
                 countryalias = countrydata.get(alias, {})
                 countryalias[subalias] = [f"{url}?id={x['id']}" for x in data]
                 countrydata[alias] = countryalias
-                countriesdata["World"] = countrydata
+                self._countriesdata["World"] = countrydata
 
-        countries = [{"iso3": x} for x in sorted(countriesdata.keys()) if x != "World"]
+        countries = [{"iso3": x} for x in sorted(self._countriesdata.keys()) if x != "World"]
         countries.append({"iso3": "World"})
-        return countriesdata, countries
+        return self._countriesdata, countries
 
 
     def generate_dataset_and_showcases(
@@ -229,13 +228,13 @@ class WorldPop:
 
 
     def generate_datasets_and_showcases(
-        self, countryiso, indicators_metadata, countrydata
+        self, countryiso
     ):
         datasets = []
         showcases = {}
-        for alias in countrydata:
+        for alias, countrydata in self._countriesdata[countryiso].items():
             dataset, d_showcases = self.generate_dataset_and_showcases(
-                countryiso, indicators_metadata[alias], countrydata[alias]
+                countryiso, self._indicators_metadata[alias], countrydata
             )
             if dataset:
                 datasets.append(dataset)

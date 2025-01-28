@@ -5,8 +5,8 @@ indicators:
     country:
       - "G2_CN_POP_2024_100m"
       - "G2_UC_POP_2024_100m"
-      - "G2_UC_POP_R24B_100m"
       - "G2_CN_POP_R24B_100m"
+      - "G2_UC_POP_R24B_100m"
     global: "G2_CN_POP_2024_100m"
   age_structures:
     country:

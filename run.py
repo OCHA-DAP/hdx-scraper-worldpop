@@ -46,7 +46,7 @@ def main(
             for _, country in progress_storing_folder(info, countries, "iso3"):
                 countryiso = country["iso3"]
                 datasets, showcases = worldpop.generate_datasets_and_showcases(
-                    countryiso, indicators_metadata, countriesdata[countryiso]
+                    countryiso
                 )
                 for dataset in datasets:
                     dataset.update_from_yaml()
