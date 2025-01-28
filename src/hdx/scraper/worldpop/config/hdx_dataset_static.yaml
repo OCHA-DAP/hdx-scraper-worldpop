@@ -1,0 +1,7 @@
+package_creator: "mcarans"
+methodology: "Other"
+methodology_other: "Please follow this link to methodology information: https://www.worldpop.org/methods/"
+dataset_source: "Multiple sources"
+license_id: "hdx-other"
+license_other: "Please follow this link to licence information: https://hub.worldpop.org/data/licence.txt"
+private: False

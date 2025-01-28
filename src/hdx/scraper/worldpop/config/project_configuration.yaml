@@ -1,0 +1,13 @@
+# Collector specific configuration
+json_url: "https://hub.worldpop.org/rest/data/"
+indicators:
+  pop:
+    - "G2_CN_POP_2024_100m"
+    - "G2_UC_POP_2024_100m"
+    - "G2_CN_POP_R24B_100m"
+    - "G2_UC_POP_R24B_100m"
+  age_structures:
+    - "G2_CN_Age_2024_100m"
+    - "G2_UC_Age_2024_100m"
+    - "G2_CN_Age_R24B_100m"
+    - "G2_UC_Age_R24B_100m"

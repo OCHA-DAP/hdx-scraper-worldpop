@@ -3,14 +3,16 @@
 Unit tests for worldpop.
 
 """
+
 from os.path import join
 
 import pytest
+
 from hdx.api.configuration import Configuration
 from hdx.api.locations import Locations
 from hdx.data.vocabulary import Vocabulary
 from hdx.location.country import Country
-from worldpop import (
+from hdx.scraper.worldpop import (
     generate_datasets_and_showcases,
     get_countriesdata,
     get_indicators_metadata,
@@ -545,10 +547,15 @@ class TestWorldPop:
         Configuration._create(
             hdx_read_only=True,
             user_agent="test",
-            project_config_yaml=join("tests", "config", "project_configuration.yaml"),
+            project_config_yaml=join(
+                "tests", "config", "project_configuration.yaml"
+            ),
         )
         Locations.set_validlocations(
-            [{"name": "zwe", "title": "Zimbabwe"}, {"name": "world", "title": "World"}]
+            [
+                {"name": "zwe", "title": "Zimbabwe"},
+                {"name": "world", "title": "World"},
+            ]
         )
         Country.countriesdata(use_live=False)
         Vocabulary._tags_dict = {}
