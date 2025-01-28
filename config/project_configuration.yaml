@@ -1,26 +1,17 @@
 # Collector specific configuration
-json_url: "https://www.worldpop.org/rest/data/"
+json_url: "https://hub.worldpop.org/rest/data/"
 indicators:
   pop:
     country:
-      - "wpgp"
-      - "wpgpunadj"
-      - "cic2020_100m"
-      - "cic2020_UNadj_100m"
-      - "wpic1km"
-      - "wpicuadj1km"
-    global: "wpgp1km"
-  pop_density:
-    country:
-      - "pd_ic_1km"
-      - "pd_ic_1km_unadj"
-  births:
-    country:
-      - "bic"
-  pregnancies:
-    country:
-      - "individual_countries"
+      - "G2_CN_POP_2024_100m"
+      - "G2_UC_POP_2024_100m"
+      - "G2_UC_POP_R24B_100m"
+      - "G2_CN_POP_R24B_100m"
+    global: "G2_CN_POP_2024_100m"
   age_structures:
     country:
-      - "aswpgp"
-    global: "aswpgponekm"
+      - "G2_CN_Age_2024_100m"
+      - "G2_UC_Age_2024_100m"
+      - "G2_CN_Age_R24B_100m"
+      - "G2_UC_Age_R24B_100m"
+    global: "G2_CN_Age_2024_100m"

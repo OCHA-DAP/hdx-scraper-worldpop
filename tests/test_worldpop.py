@@ -560,57 +560,51 @@ class TestWorldPop:
         return Configuration.read()
 
     @pytest.fixture(scope="function")
-    def downloader(self):
-        class Download:
-            url = None
-
-            @classmethod
-            def download(cls, url):
-                cls.url = url
-
-            @classmethod
-            def get_json(cls):
-                if cls.url == "http://lala/getJSON/":
+    def retriever(self):
+        class Retrieve:
+            @staticmethod
+            def download_json(url):
+                if url == "http://lala/getJSON/":
                     return {"data": TestWorldPop.indicators_metadata}
-                elif cls.url == "http://papa/getJSON/pop/wpgp":
+                elif url == "http://papa/getJSON/pop/wpgp":
                     return {"data": TestWorldPop.wpgpdata}
-                elif cls.url == "http://papa/getJSON/pop/wpgpunadj":
+                elif url == "http://papa/getJSON/pop/wpgpunadj":
                     return {"data": TestWorldPop.wpgpunadjdata}
-                elif cls.url == "http://papa/getJSON/pop/wpgp1km":
+                elif url == "http://papa/getJSON/pop/wpgp1km":
                     return {"data": TestWorldPop.wpgp1kmdata}
-                elif cls.url == "http://papa/getJSON/pop/wpgp?iso3=ZWE":
+                elif url == "http://papa/getJSON/pop/wpgp?iso3=ZWE":
                     return {"data": TestWorldPop.metadata}
-                elif cls.url == "http://papa/getJSON/pop/wpgpunadj?iso3=ZWE":
+                elif url == "http://papa/getJSON/pop/wpgpunadj?iso3=ZWE":
                     return {"data": TestWorldPop.metadataunadj}
-                elif cls.url == "http://papa/getJSON/pop/wpgp1km?id=24776":
+                elif url == "http://papa/getJSON/pop/wpgp1km?id=24776":
                     return {"data": TestWorldPop.metadata_24776}
-                elif cls.url == "http://papa/getJSON/pop/wpgp1km?id=24777":
+                elif url == "http://papa/getJSON/pop/wpgp1km?id=24777":
                     return {"data": TestWorldPop.metadata_24777}
 
             @staticmethod
-            def get_text():
+            def download_text(url):
                 return (
                     "The WorldPop project aims to provide an open access archive of spatial "
                     "demographic datasets ... at creativecommons.org."
                 )
 
-        return Download()
+        return Retrieve()
 
-    def test_get_indicators_metadata(self, configuration, downloader):
+    def test_get_indicators_metadata(self, configuration, retriever):
         indicators = configuration["indicators"]
         indicators_metadata = get_indicators_metadata(
-            "http://lala/getJSON/", downloader, indicators
+            "http://lala/getJSON/", retriever, indicators
         )
         assert "pop" in indicators_metadata.keys()
         assert sorted(
             list(indicators_metadata.values()), key=lambda k: k["alias"]
         ) == sorted(TestWorldPop.indicators_metadata, key=lambda k: k["alias"])
 
-    def test_get_countriesdata(self, configuration, downloader):
+    def test_get_countriesdata(self, configuration, retriever):
         indicators = configuration["indicators"]
         cutdownindicators = {"pop": indicators["pop"]}
         countriesdata, countries = get_countriesdata(
-            "http://papa/getJSON/", downloader, cutdownindicators
+            "http://papa/getJSON/", retriever, cutdownindicators
         )
         assert countriesdata == TestWorldPop.countriesdata
         assert countries == [
@@ -622,12 +616,12 @@ class TestWorldPop:
             {"iso3": "World"},
         ]
 
-    def test_generate_datasets_and_showcases(self, configuration, downloader):
+    def test_generate_datasets_and_showcases(self, configuration, retriever):
         indicators_metadata = {"pop": TestWorldPop.indicators_metadata[0]}
         countryiso = "World"
         countrydata = TestWorldPop.countriesdata[countryiso]
         datasets, showcases = generate_datasets_and_showcases(
-            downloader, countryiso, indicators_metadata, countrydata
+            retriever, countryiso, indicators_metadata, countrydata
         )
         dataset = datasets[0]
         assert dataset == {
@@ -702,7 +696,7 @@ class TestWorldPop:
         countryiso = "ZWE"
         countrydata = TestWorldPop.countriesdata[countryiso]
         datasets, showcases = generate_datasets_and_showcases(
-            downloader, countryiso, indicators_metadata, countrydata
+            retriever, countryiso, indicators_metadata, countrydata
         )
         dataset = datasets[0]
         assert dataset == {
