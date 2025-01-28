@@ -59,8 +59,6 @@ def main(
 
             for _, country in progress_storing_folder(info, countries, "iso3"):
                 countryiso3 = country["iso3"]
-                if countryiso3 != "AFG":  # ***
-                    continue
                 datasets, showcases = (
                     worldpop.generate_all_datasets_and_showcases(countryiso3)
                 )

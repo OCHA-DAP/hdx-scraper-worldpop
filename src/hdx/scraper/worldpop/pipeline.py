@@ -59,10 +59,7 @@ class Pipeline:
                     countrydata[alias] = countryalias
                     self._countriesdata[iso3] = countrydata
 
-        countries = [
-            {"iso3": x}
-            for x in sorted(self._countriesdata.keys())
-        ]
+        countries = [{"iso3": x} for x in sorted(self._countriesdata.keys())]
         return self._countriesdata, countries
 
     def generate_all_datasets_and_showcases(self, countryiso3):
