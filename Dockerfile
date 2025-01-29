@@ -4,7 +4,6 @@ WORKDIR /srv
 
 COPY . .
 
-RUN pip --no-cache-dir install --upgrade -r requirements.txt && \
-    pip --no-cache-dir install .
+RUN pip install --no-cache-dir .
 
-CMD ["python3", "-m", "hdx.scraper.worldpop"]
+CMD "python3 -m hdx.scraper.worldpop"
