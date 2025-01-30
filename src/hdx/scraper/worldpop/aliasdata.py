@@ -29,6 +29,7 @@ class AliasData:
         self._configuration = configuration
         self._countryiso3 = countryiso3
         self._indicator_metadata = indicator_metadata
+        self._alias = indicator_metadata["alias"]
         self._countrydata = countrydata
         self._allmetadata = {}
         self._countryname = None
@@ -51,7 +52,11 @@ class AliasData:
         return self._allmetadata
 
     def get_tags(self):
-        return [self._indicator_metadata["name"].lower(), "geodata"]
+        tags_info = self._configuration["tags"]
+        tags = [self._indicator_metadata["name"].lower()]
+        tags.extend(tags_info["global"])
+        tags.extend(tags_info.get(self._alias, []))
+        return tags
 
     def set_country_name(self):
         if self._countryiso3 == "World":
@@ -65,15 +70,10 @@ class AliasData:
                 return False
         return True
 
-    def get_caveats(self, desc):
+    def get_caveats(self, disclaimer):
         allmetadatavalues = list(self._allmetadata.values())
         lastmetadata = allmetadatavalues[0][-1]
         citation = lastmetadata["citation"]
-        disclaimer = desc.split("Disclaimer", maxsplit=1)
-        if len(disclaimer) == 2:
-            disclaimer = f"Disclaimer{disclaimer[1]}  \n  \n"
-        else:
-            disclaimer = ""
         return f"{disclaimer}{self._configuration['caveat_prefix']}{citation}"
 
     def generate_dataset(self, metadata):
@@ -103,13 +103,18 @@ class AliasData:
         dataset["name"] = f"{base_name}-{year}"
         dataset["title"] = title
         notes_suffix = self._configuration["notes_suffix"]
-        alias = self._indicator_metadata["alias"]
         desc = metadata["desc"]
+        disclaimer = desc.split("Disclaimer", maxsplit=1)
+        if len(disclaimer) == 2:
+            desc = disclaimer[0]
+            disclaimer = f"Disclaimer{disclaimer[1]}  \n  \n"
+        else:
+            disclaimer = ""
         notes = desc.split("File Descriptions:", maxsplit=1)
         dataset["notes"] = (
-            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(alias, '')}"
+            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._alias, '')}"
         )
-        dataset["caveats"] = self.get_caveats(desc)
+        dataset["caveats"] = self.get_caveats(disclaimer)
         dataset.set_maintainer("37023db4-a571-4f28-8d1f-15f0353586af")
         dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
         dataset.set_expected_update_frequency("Every year")
