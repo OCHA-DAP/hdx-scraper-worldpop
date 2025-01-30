@@ -44,7 +44,7 @@ def main(
         "3f077dff-1d05-484d-a7c2-4cb620f22689", "create_dataset"
     ):
         raise PermissionError(
-            "API Token does not give access to OPHI organisation!"
+            "API Token does not give access to WorldPop organisation!"
         )
     with wheretostart_tempdir_batch(lookup) as info:
         folder = info["folder"]
