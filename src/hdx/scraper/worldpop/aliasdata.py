@@ -18,9 +18,15 @@ class AliasData:
     distance_regex = re.compile(r"_\d*m")
 
     def __init__(
-        self, retriever, countryiso3, indicator_metadata, countrydata
+        self,
+        retriever,
+        configuration,
+        countryiso3,
+        indicator_metadata,
+        countrydata,
     ):
         self._retriever = retriever
+        self._configuration = configuration
         self._countryiso3 = countryiso3
         self._indicator_metadata = indicator_metadata
         self._countrydata = countrydata
@@ -59,11 +65,16 @@ class AliasData:
                 return False
         return True
 
-    def get_caveats(self):
+    def get_caveats(self, desc):
         allmetadatavalues = list(self._allmetadata.values())
         lastmetadata = allmetadatavalues[0][-1]
         citation = lastmetadata["citation"]
-        return f"Data for earlier dates is available directly from WorldPop  \n  \n{citation}"
+        disclaimer = desc.split("Disclaimer", maxsplit=1)
+        if len(disclaimer) == 2:
+            disclaimer = f"Disclaimer{disclaimer[1]}  \n  \n"
+        else:
+            disclaimer = ""
+        return f"{disclaimer}{self._configuration['caveat_prefix']}{citation}"
 
     def generate_dataset(self, metadata):
         dataset = Dataset()
@@ -91,8 +102,14 @@ class AliasData:
         logger.info(f"Creating dataset: {title}")
         dataset["name"] = f"{base_name}-{year}"
         dataset["title"] = title
-        dataset["notes"] = metadata["desc"]
-        dataset["caveats"] = self.get_caveats()
+        notes_suffix = self._configuration["notes_suffix"]
+        alias = self._indicator_metadata["alias"]
+        desc = metadata["desc"]
+        notes = desc.split("File Descriptions:", maxsplit=1)
+        dataset["notes"] = (
+            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(alias, '')}"
+        )
+        dataset["caveats"] = self.get_caveats(desc)
         dataset.set_maintainer("37023db4-a571-4f28-8d1f-15f0353586af")
         dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
         dataset.set_expected_update_frequency("Every year")

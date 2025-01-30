@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 class Pipeline:
     def __init__(self, retriever: Retrieve, configuration: Configuration):
         self._retriever = retriever
+        self._configuration = configuration
         self._json_url = configuration["json_url"]
         self._indicators = configuration["indicators"]
         self._indicators_metadata = {}
@@ -68,6 +69,7 @@ class Pipeline:
         for alias, countrydata in self._countriesdata[countryiso3].items():
             aliasdata = AliasData(
                 self._retriever,
+                self._configuration,
                 countryiso3,
                 self._indicators_metadata[alias],
                 countrydata,
