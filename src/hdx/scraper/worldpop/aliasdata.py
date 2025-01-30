@@ -129,18 +129,19 @@ class AliasData:
         }
 
         url_img = metadata["url_img"]
-        url_summary = metadata["url_summary"]
-        showcase = Showcase(
-            {
-                "name": base_name,
-                "title": f"WorldPop {self._countryname} {project} Summary Page",
-                "notes": f"Summary for {category} - {self._countryname}",
-                "url": url_summary,
-                "image_url": url_img,
-            }
-        )
-        showcase.add_tags(self.get_tags())
-        self._showcases[base_name] = showcase
+        if url_img:
+            url_summary = metadata["url_summary"]
+            showcase = Showcase(
+                {
+                    "name": base_name,
+                    "title": f"WorldPop {self._countryname} {project} Summary Page",
+                    "notes": f"Summary for {category} - {self._countryname}",
+                    "url": url_summary,
+                    "image_url": url_img,
+                }
+            )
+            showcase.add_tags(self.get_tags())
+            self._showcases[base_name] = showcase
         return dataset, resource_data
 
     def generate_datasets(self):
