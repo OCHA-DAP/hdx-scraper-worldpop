@@ -7,7 +7,6 @@ from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
-from hdx.location.country import Country
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.path import get_filename_extension_from_url
 
@@ -22,88 +21,55 @@ class AliasData:
         retriever,
         configuration,
         countryiso3,
-        indicator_metadata,
-        countrydata,
+        countryname,
+        metadata,
     ):
         self._retriever = retriever
         self._configuration = configuration
         self._countryiso3 = countryiso3
-        self._indicator_metadata = indicator_metadata
-        self._alias = indicator_metadata["alias"]
-        self._countrydata = countrydata
-        self._allmetadata = {}
-        self._countryname = None
-        self._showcases = {}
+        self._countryname = countryname
+        self._metadata = metadata
+        self._showcase = {}
+        self._resource_base_description = None
 
-    def get_showcases(self):
-        return self._showcases
-
-    def get_allmetadata_for_country(self):
-        for subalias, urls in self._countrydata.items():
-            allmetadata_subalias = self._allmetadata.get(subalias, [])
-            for url in urls:
-                json = self._retriever.download_json(url)
-                data = json["data"]
-                if isinstance(data, list):
-                    allmetadata_subalias.extend(data)
-                else:
-                    allmetadata_subalias.append(data)
-            self._allmetadata[subalias] = allmetadata_subalias
-        return self._allmetadata
+    def get_showcase(self):
+        return self._showcase
 
     def get_tags(self):
-        tags_info = self._configuration["tags"]
-        tags = [self._indicator_metadata["name"].lower()]
-        tags.extend(tags_info["global"])
-        tags.extend(tags_info.get(self._alias, []))
-        return tags
-
-    def set_country_name(self):
-        if self._countryiso3 == "World":
-            self._countryname = self._countryiso3
-        else:
-            self._countryname = Country.get_country_name_from_iso3(
-                self._countryiso3
-            )
-            if not self._countryname:
-                logger.exception(f"ISO3 {self._countryiso3} not recognised!")
-                return False
-        return True
+        return [self._metadata["project"].lower(), "geodata"]
 
     def get_caveats(self, disclaimer):
-        allmetadatavalues = list(self._allmetadata.values())
-        lastmetadata = allmetadatavalues[0][-1]
-        citation = lastmetadata["citation"]
+        citation = self._metadata["citation"]
         return f"{disclaimer}{self._configuration['caveat_prefix']}{citation}"
 
-    def generate_dataset(self, metadata):
+    def generate_dataset_and_showcase(self):
         dataset = Dataset()
         try:
             dataset.add_other_location(self._countryiso3)
         except HDXError as e:
             logger.exception(f"{self._countryiso3} has a problem! {e}")
             return None, None
-        project = metadata["project"]
-        category = metadata["category"]
-        title = metadata["title"]
-        year = int(metadata["popyear"])
+        project = self._metadata["project"]
+        category = self._metadata["category"]
+        title = self._metadata["title"]
         estimate_type, _ = category.split(maxsplit=1)
-        if "-" in category:
-            start, end = category.split("-")
-            year_range = f"{start[-4:]}-{end[:4]}"
-            category_shorter = f"{estimate_type.lower()} {year_range}"
-            title = f"{title} for {year} ({category_shorter})"
-        else:
-            category_shorter = estimate_type.lower()
-            title = f"{title} ({estimate_type})"
-        base_name = slugify(
+        start_year = self._metadata["popyear"]
+        end_year = self._metadata["endpopyear"]
+        year_range = f"{start_year}-{end_year}"
+        category_shorter = f"{estimate_type.lower()} {year_range}"
+        title = f"{title} ({category_shorter})"
+        name = slugify(
             f"worldpop-{project}-{category_shorter}-{self._countryiso3}"
         )
         logger.info(f"Creating dataset: {title}")
-        dataset["name"] = f"{base_name}-{year}"
+        dataset["name"] = name
         dataset["title"] = title
         notes_suffix = self._configuration["notes_suffix"]
-        desc = metadata["desc"]
+        desc = (
+            self._metadata["desc"]
+            .replace(f" in {start_year}", "")
+            .replace(f" of {start_year}", "")
+        )
         disclaimer = desc.split("Disclaimer", maxsplit=1)
         if len(disclaimer) == 2:
             desc = disclaimer[0]
@@ -112,28 +78,27 @@ class AliasData:
             disclaimer = ""
         notes = desc.split("File Descriptions:", maxsplit=1)
         dataset["notes"] = (
-            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._alias, '')}"
+            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._metadata["alias"], '')}"
         )
         dataset["caveats"] = self.get_caveats(disclaimer)
         dataset.set_maintainer("37023db4-a571-4f28-8d1f-15f0353586af")
         dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
         dataset.set_expected_update_frequency("Every year")
         dataset.set_subnational(True)
-        dataset.set_time_period_year_range(year)
+        dataset.set_time_period_year_range(start_year, end_year)
         dataset.add_tags(self.get_tags())
 
         bracketed_text = category.split("(", 1)[1].split(")")[0].strip()
-        resource_data = {
-            "description": f"{estimate_type} {project.lower()} ({bracketed_text}) for {year}",
-            "format": metadata["data_format"],
-        }
+        self._resource_base_description = (
+            f"{estimate_type} {project.lower()} ({bracketed_text}) for "
+        )
 
-        url_img = metadata["url_img"]
+        url_img = self._metadata["url_img"]
         if url_img:
-            url_summary = metadata["url_summary"]
+            url_summary = self._metadata["url_summary"]
             showcase = Showcase(
                 {
-                    "name": base_name,
+                    "name": f"{name}-showcase",
                     "title": f"WorldPop {self._countryname} {project} Summary Page",
                     "notes": f"Summary for {category} - {self._countryname}",
                     "url": url_summary,
@@ -141,10 +106,11 @@ class AliasData:
                 }
             )
             showcase.add_tags(self.get_tags())
-            self._showcases[base_name] = showcase
-        return dataset, resource_data
+        else:
+            showcase = None
+        return dataset, showcase
 
-    def generate_datasets(self):
+    def add_resource_to(self, dataset, metadata):
         """Parse json of the form:
         {'id': '1482', 'title': 'The spatial distribution of population in 2000,
             Zimbabwe', 'desc': 'Estimated total number of people per grid-cell...',  'doi': '10.5258/SOTON/WP00645',
@@ -160,31 +126,23 @@ class AliasData:
             'license': 'https://www.worldpop.org/data/licence.txt',
             'url_summary': 'https://www.worldpop.org/geodata/summary?id=1482'}
         """
-        datasets = []
-        for subalias, subalias_metadata in self._allmetadata.items():
-            for metadata in subalias_metadata:
-                if metadata["public"].lower() != "y":
-                    continue
-                dataset, resource_data = self.generate_dataset(metadata)
-                if not dataset:
-                    continue
-                date = parse_date(
-                    metadata["date"],
-                    timezone_handling=3,
-                    include_microseconds=True,
-                )
-                for url in sorted(metadata["files"], reverse=True):
-                    filename, extension = get_filename_extension_from_url(url)
-                    match = self.distance_regex.search(filename)
-                    if match:
-                        filename = filename[: match.end()]
-                    resource = Resource(resource_data)
-                    resource["name"] = f"{filename}{extension}".lower()
-                    resource["url"] = url
-                    resource.set_date_data_updated(date)
-                    dataset.add_update_resource(resource)
-                if len(dataset.get_resources()) == 0:
-                    logger.error(f"{dataset['title']} has no data!")
-                    continue
-                datasets.append(dataset)
-        return datasets
+        date = parse_date(
+            metadata["date"],
+            timezone_handling=3,
+            include_microseconds=True,
+        )
+        for url in sorted(metadata["files"], reverse=True):
+            filename, extension = get_filename_extension_from_url(url)
+            match = self.distance_regex.search(filename)
+            if match:
+                filename = filename[: match.end()]
+            resource = Resource(
+                {
+                    "name": f"{filename}{extension}".lower(),
+                    "url": url,
+                    "description": f"{self._resource_base_description}{metadata['popyear']}",
+                    "format": metadata["data_format"],
+                }
+            )
+            resource.set_date_data_updated(date)
+            dataset.add_update_resource(resource)

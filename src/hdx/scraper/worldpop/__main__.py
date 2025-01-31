@@ -59,10 +59,10 @@ def main(
 
             for _, country in progress_storing_folder(info, countries, "iso3"):
                 countryiso3 = country["iso3"]
-                datasets, showcases = (
-                    worldpop.generate_all_datasets_and_showcases(countryiso3)
+                datasets, showcases = worldpop.generate_datasets_and_showcases(
+                    countryiso3
                 )
-                for dataset in datasets:
+                for i, dataset in enumerate(datasets):
                     dataset.update_from_yaml(
                         script_dir_plus_file(
                             join("config", "hdx_dataset_static.yaml"), main
@@ -74,11 +74,9 @@ def main(
                         updated_by_script="HDX Scraper: WorldPop",
                         batch=info["batch"],
                     )
-                for base_name, showcase in showcases.items():
+                    showcase = showcases[i]
                     showcase.create_in_hdx()
-                    for dataset in datasets:
-                        if dataset["name"][:-5] == base_name:
-                            showcase.add_dataset(dataset)
+                    showcase.add_dataset(dataset)
 
     logger.info("HDX Scraper WorldPop pipeline completed!")
 
@@ -86,7 +84,7 @@ def main(
 if __name__ == "__main__":
     facade(
         main,
-        hdx_site="demo",
+        hdx_site="stage",
         user_agent_config_yaml=join(expanduser("~"), ".useragents.yaml"),
         user_agent_lookup=lookup,
         project_config_yaml=script_dir_plus_file(

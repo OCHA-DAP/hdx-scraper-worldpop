@@ -1,25 +1,11 @@
 # Collector specific configuration
 json_url: "https://hub.worldpop.org/rest/data/"
 indicators:
-  pop:
-    - "G2_CN_POP_2024_100m"
-    - "G2_UC_POP_2024_100m"
-    - "G2_CN_POP_R24B_100m"
-    - "G2_UC_POP_R24B_100m"
-  age_structures:
-    - "G2_CN_Age_2024_100m"
-    - "G2_UC_Age_2024_100m"
-    - "G2_CN_Age_R24B_100m"
-    - "G2_UC_Age_R24B_100m"
+  pop: "G2_CN_POP_R24B_100m"
+  age_structures: "G2_CN_Age_R24B_100m"
 
 caveat_prefix: "Data for earlier dates is available directly from WorldPop  \n  \n"
 
 notes_suffix:
   global: "  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained"
   age_structures: "  \n  \n**File Descriptions:**  \n  \n_{iso}\_{gender}\_{age group}\_{year}\_{type}\_{resolution}.tif_  \n  \n_iso_  \n  \nThree-letter country code  \n  \n_gender_  \n  \nm = male, f= female, t = both genders  \n  \n_age group_  \n  \n*   00 = age group 0 to 12 months  \n*   01 = age group 1 to 4 years  \n*   05 = age group 5 to 9 years  \n*   90 = age 90 years and over  \n  \n_year_  \n  \nYear that the population represents  \n  \n_type_  \n  \nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/) , UC= [Unconstrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)  \n  \n_resolution_  \n  \nResolution of the data e.q. 100m = 3 arc (approximately 100m at the equator)"
-
-tags:
-  global:
-    - "geodata"
-  age_structures:
-    - "sex and age disaggregated data-sadd"

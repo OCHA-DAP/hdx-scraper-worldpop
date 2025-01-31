@@ -10,8 +10,8 @@ Reads WorldPop JSON and creates datasets.
 import logging
 
 from hdx.api.configuration import Configuration
+from hdx.location.country import Country
 from hdx.scraper.worldpop.aliasdata import AliasData
-from hdx.utilities.dictandlist import dict_of_lists_add
 from hdx.utilities.retriever import Retrieve
 
 logger = logging.getLogger(__name__)
@@ -37,50 +37,71 @@ class Pipeline:
         return self._indicators_metadata
 
     def get_countriesdata(self):
-        def download(alias, subalias):
-            url = f"{self._json_url}{alias}/{subalias}"
+        def download(alias, indicator):
+            url = f"{self._json_url}{alias}/{indicator}"
             json = self._retriever.download_json(url)
 
             return url, json["data"]
 
-        for alias, indicators_alias in self._indicators.items():
-            for subalias in indicators_alias:
-                url, data = download(alias, subalias)
-                iso3s = set()
-                for info in data:
-                    iso3 = info["iso3"]
-                    if iso3 in iso3s:
-                        continue
-                    iso3s.add(iso3)
-                    countrydata = self._countriesdata.get(iso3, {})
-                    countryalias = countrydata.get(alias, {})
-                    dict_of_lists_add(
-                        countryalias, subalias, f"{url}?iso3={iso3}"
-                    )
-                    countrydata[alias] = countryalias
-                    self._countriesdata[iso3] = countrydata
+        for alias, indicator in self._indicators.items():
+            url, data = download(alias, indicator)
+            iso3s = set()
+            for info in data:
+                iso3 = info["iso3"]
+                if iso3 in iso3s:
+                    continue
+                iso3s.add(iso3)
+                countrydata = self._countriesdata.get(iso3, {})
+                countrydata[alias] = f"{url}?iso3={iso3}"
+                self._countriesdata[iso3] = countrydata
 
         countries = [{"iso3": x} for x in sorted(self._countriesdata.keys())]
         return self._countriesdata, countries
 
-    def generate_all_datasets_and_showcases(self, countryiso3):
-        all_datasets = []
-        all_showcases = {}
-        for alias, countrydata in self._countriesdata[countryiso3].items():
+    @staticmethod
+    def get_countryname(countryiso3):
+        if countryiso3 == "World":
+            return countryiso3
+        else:
+            countryname = Country.get_country_name_from_iso3(countryiso3)
+            if not countryname:
+                logger.exception(f"ISO3 {countryiso3} not recognised!")
+                return None
+            return countryname
+
+    def generate_datasets_and_showcases(self, countryiso3):
+        datasets = []
+        showcases = []
+        countryname = self.get_countryname(countryiso3)
+        if not countryname:
+            return
+        for alias, country_url in self._countriesdata[countryiso3].items():
+            metadata_allyears = self._retriever.download_json(country_url)[
+                "data"
+            ]
+            # We're going to take one year's metadata and make it for all
+            # years since we're making one dataset
+            metadata = metadata_allyears[0]
+            # Assume that if one year is excluded, then the whole alias is out
+            if metadata["public"].lower() != "y":
+                continue
+            metadata["endpopyear"] = metadata_allyears[-1]["popyear"]
+            metadata["alias"] = alias
             aliasdata = AliasData(
                 self._retriever,
                 self._configuration,
                 countryiso3,
-                self._indicators_metadata[alias],
-                countrydata,
+                countryname,
+                metadata,
             )
-            success = aliasdata.set_country_name()
-            if not success:
+            dataset, showcase = aliasdata.generate_dataset_and_showcase()
+            if not dataset:
                 continue
-            aliasdata.get_allmetadata_for_country()
-            datasets = aliasdata.generate_datasets()
-            if not datasets:
-                continue
-            all_datasets.extend(datasets)
-            all_showcases.update(aliasdata.get_showcases())
-        return all_datasets, all_showcases
+            for metadata in metadata_allyears:
+                aliasdata.add_resource_to(dataset, metadata)
+            if len(dataset.get_resources()) == 0:
+                logger.error(f"{dataset['title']} has no data!")
+            else:
+                datasets.append(dataset)
+                showcases.append(showcase)
+        return datasets, showcases

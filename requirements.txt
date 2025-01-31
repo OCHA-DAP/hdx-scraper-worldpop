@@ -44,7 +44,7 @@ frictionless==5.18.0
     # via hdx-python-utilities
 hdx-python-api==6.3.7
     # via hdx-scraper-worldpop (pyproject.toml)
-hdx-python-country==3.8.7
+hdx-python-country==3.8.8
     # via
     #   hdx-scraper-worldpop (pyproject.toml)
     #   hdx-python-api

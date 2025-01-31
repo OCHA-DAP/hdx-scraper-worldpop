@@ -84,22 +84,28 @@ class TestWorldPop:
                     == "Age and sex structures"
                 )
                 countries_data, countries = worldpop.get_countriesdata()
-                assert len(countries_data) == 238
-                assert countries_data["AFG"]["pop"]["G2_CN_POP_2024_100m"] == [
-                    "https://hub.worldpop.org/rest/data/pop/G2_CN_POP_2024_100m?iso3=AFG"
-                ]
-                datasets, showcases = (
-                    worldpop.generate_all_datasets_and_showcases("AFG")
+                assert len(countries_data) == 26
+                assert (
+                    countries_data["AFG"]["pop"]
+                    == "https://hub.worldpop.org/rest/data/pop/G2_CN_POP_R24B_100m?iso3=AFG"
                 )
-                assert len(datasets) == 68
-                assert datasets[1] == {
-                    "caveats": "Data for earlier dates is available directly from WorldPop  \n  \nBondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A.. Constrained estimates of 2024 total number of people per grid square at a resolution of 3 arc (approximately 100m at the equator) R2024A version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. DOI:10.5258/SOTON/WP00801",
+                assert (
+                    countries_data["AFG"]["age_structures"]
+                    == "https://hub.worldpop.org/rest/data/age_structures/G2_CN_Age_R24B_100m?iso3=AFG"
+                )
+                datasets, showcases = worldpop.generate_datasets_and_showcases(
+                    "AFG"
+                )
+                assert len(datasets) == 2
+                dataset = datasets[0]
+                assert dataset == {
+                    "caveats": "Disclaimer:The dataset currently represents a beta version (R2024B) product and may change over the coming year as improvements are made.  \n  \nData for earlier dates is available directly from WorldPop  \n  \nBondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A.. Constrained estimates of 2015-2030 total number of people per grid square at a resolution of 3 arc (approximately 100m at the equator) R2024B version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. DOI:10.5258/SOTON/WP00803",
                     "data_update_frequency": "365",
-                    "dataset_date": "[2024-01-01T00:00:00 TO 2024-12-31T23:59:59]",
+                    "dataset_date": "[2015-01-01T00:00:00 TO 2030-12-31T23:59:59]",
                     "groups": [{"name": "afg"}],
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
-                    "name": "worldpop-population-counts-unconstrained-afg-2024",
-                    "notes": "Unconstrained estimates of 2024, total number of people per grid-cell. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are number of people per pixel. The mapping approach is Random Forest-based dasymetric redistribution.  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained",
+                    "name": "worldpop-population-counts-constrained-2015-2030-afg",
+                    "notes": "Constrained estimates, total number of people per grid-cell. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are number of people per pixel. The mapping approach is Random Forest-based dasymetric redistribution.&nbsp;  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
                     "tags": [
@@ -112,41 +118,63 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "The spatial distribution of population in 2024, Afghanistan (Unconstrained)",
+                    "title": "Afghanistan - Spatial Distribution of Population (constrained 2015-2030)",
                 }
-                assert datasets[51] == {
-                    "caveats": "Disclaimer:The dataset currently represents a beta version (R2024B) product and may change over the coming year as improvements are made.  \n  \nData for earlier dates is available directly from WorldPop  \n  \nBondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A.. Constrained estimates of 2024 total number of people per grid square broken down by gender and age groupings at a resolution of 3 arc (approximately 100m at the equator) R2024A version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. DOI:10.5258/SOTON/WP00803",
+                resources = dataset.get_resources()
+                assert len(resources) == 16
+                assert resources[3] == {
+                    "description": "Constrained population counts (100m resolution) for 2018",
+                    "format": "geotiff",
+                    "last_modified": "2024-12-01T00:00:00.000000",
+                    "name": "afg_pop_2018_cn_100m.tif",
+                    "resource_type": "api",
+                    "url": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2018/AFG/v1/100m/constrained/afg_pop_2018_CN_100m_R2024B_v1.tif",
+                    "url_type": "api",
+                }
+
+                dataset = datasets[1]
+                assert dataset == {
+                    "caveats": "Disclaimer:The dataset currently represents a beta version (R2024B) product and may change over the coming year as improvements are made.  \n  \nData for earlier dates is available directly from WorldPop  \n  \nBondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A.. Constrained estimates of 2015-2030 total number of people per grid square broken down by gender and age groupings at a resolution of 3 arc (approximately 100m at the equator) R2024B version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. DOI:10.5258/SOTON/WP00805",
                     "data_update_frequency": "365",
-                    "dataset_date": "[2030-01-01T00:00:00 TO 2030-12-31T23:59:59]",
+                    "dataset_date": "[2015-01-01T00:00:00 TO 2030-12-31T23:59:59]",
                     "groups": [{"name": "afg"}],
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
-                    "name": "worldpop-age-and-sex-structures-constrained-2015-2030-afg-2030",
-                    "notes": "Constrained estimates of total number of people per grid square broken down by gender and age groupings (including 0-1 and by 5-year up to 90+) in 2030 for Afghanistan, version v1. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are estimated number of male, female or both in each age group per grid square.&nbsp;  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained  \n  \n**File Descriptions:**  \n  \n_{iso}\xa0{gender}\xa0{age group}\xa0{year}\xa0{type}\xa0{resolution}.tif_  \n  \n_iso_  \n  \nThree-letter country code  \n  \n_gender_  \n  \nm = male, f= female, t = both genders  \n  \n_age group_  \n  \n*   00 = age group 0 to 12 months  \n*   01 = age group 1 to 4 years  \n*   05 = age group 5 to 9 years  \n*   90 = age 90 years and over  \n  \n_year_  \n  \nYear that the population represents  \n  \n_type_  \n  \nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/) , UC= [Unconstrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)  \n  \n_resolution_  \n  \nResolution of the data e.q. 100m = 3 arc (approximately 100m at the equator)",
+                    "name": "worldpop-age-and-sex-structures-constrained-2015-2030-afg",
+                    "notes": "Constrained estimates of total number of people per grid square broken down by gender and age groupings (including 0-1 and by 5-year up to 90+) for Afghanistan, version v1. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are estimated number of male, female or both in each age group per grid square.&nbsp;  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained  \n  \n**File Descriptions:**  \n  \n_{iso}\xa0{gender}\xa0{age group}\xa0{year}\xa0{type}\xa0{resolution}.tif_  \n  \n_iso_  \n  \nThree-letter country code  \n  \n_gender_  \n  \nm = male, f= female, t = both genders  \n  \n_age group_  \n  \n*   00 = age group 0 to 12 months  \n*   01 = age group 1 to 4 years  \n*   05 = age group 5 to 9 years  \n*   90 = age 90 years and over  \n  \n_year_  \n  \nYear that the population represents  \n  \n_type_  \n  \nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/) , UC= [Unconstrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)  \n  \n_resolution_  \n  \nResolution of the data e.q. 100m = 3 arc (approximately 100m at the equator)",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
                     "tags": [
-                        {
-                            "name": "baseline population",
-                            "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
-                        },
                         {
                             "name": "demographics",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
+                            "name": "baseline population",
+                            "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                        },
+                        {
                             "name": "geodata",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "Afghanistan - Age and Sex Structures for 2030 (constrained 2015-2030)",
+                    "title": "Afghanistan - Age and Sex Structures (constrained 2015-2030)",
+                }
+                resources = dataset.get_resources()
+                assert len(resources) == 641
+                assert resources[10] == {
+                    "description": "Constrained age and sex structures (100m resolution) for 2015",
+                    "format": "geotiff",
+                    "last_modified": "2024-12-01T00:00:00.000000",
+                    "name": "afg_t_40_2015_cn_100m.tif",
+                    "resource_type": "api",
+                    "url": "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2024B/2015/AFG/v1/100m/constrained//afg_t_40_2015_CN_100m_R2024B_v1.tif",
+                    "url_type": "api",
                 }
 
-                assert len(showcases) == 8
-                assert showcases[
-                    "worldpop-population-counts-constrained-2015-2030-afg"
-                ] == {
-                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/52040/afg_pop_2019_CN_100m_R2024B_v1_Image.png",
-                    "name": "worldpop-population-counts-constrained-2015-2030-afg",
+                assert len(showcases) == 2
+                assert showcases[0] == {
+                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/52025/afg_pop_2019_CN_100m_R2024B_v1_Image.png",
+                    "name": "worldpop-population-counts-constrained-2015-2030-afg-showcase",
                     "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
                     "tags": [
                         {
@@ -159,21 +187,19 @@ class TestWorldPop:
                         },
                     ],
                     "title": "WorldPop Afghanistan Population Counts Summary Page",
-                    "url": "https://hub.worldpop.org/geodata/summary?id=52040",
+                    "url": "https://hub.worldpop.org/geodata/summary?id=52025",
                 }
-                assert showcases[
-                    "worldpop-age-and-sex-structures-constrained-afg"
-                ] == {
-                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/51398/afg_t_00_2024_CN_100m_R2024A_v1_Image.png",
-                    "name": "worldpop-age-and-sex-structures-constrained-afg",
-                    "notes": "Summary for Constrained individual countries 2024 ( 100m resolution ) - Afghanistan",
+                assert showcases[1] == {
+                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/52828/afg_agesex_CN_100m_R2024B_v1_Image.png",
+                    "name": "worldpop-age-and-sex-structures-constrained-2015-2030-afg-showcase",
+                    "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
                     "tags": [
                         {
-                            "name": "baseline population",
+                            "name": "demographics",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
-                            "name": "demographics",
+                            "name": "baseline population",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
@@ -182,5 +208,5 @@ class TestWorldPop:
                         },
                     ],
                     "title": "WorldPop Afghanistan Age and sex structures Summary Page",
-                    "url": "https://hub.worldpop.org/geodata/summary?id=51398",
+                    "url": "https://hub.worldpop.org/geodata/summary?id=52828",
                 }
