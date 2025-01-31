@@ -45,7 +45,7 @@ file = "README.md"
 content-type = "text/markdown"
 
 [project.urls]
-Homepage = "https://github.com/OCHA-DAP/hdx-scraper-ophi"
+Homepage = "https://github.com/OCHA-DAP/hdx-scraper-worldpop"
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-check", "pytest-cov"]

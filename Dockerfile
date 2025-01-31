@@ -4,6 +4,7 @@ WORKDIR /srv
 
 COPY . .
 
-RUN pip install --no-cache-dir .
+RUN  --mount=source=.git,target=.git,type=bind \
+     pip install --no-cache-dir .
 
 CMD "python3 -m hdx.scraper.worldpop"
