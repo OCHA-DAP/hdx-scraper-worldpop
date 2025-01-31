@@ -6,7 +6,7 @@ COPY . .
 
 RUN --mount=source=.git,target=.git,type=bind \
     apk add --no-cache --upgrade --virtual .build-deps \
-        git \
+        git && \
     pip install --no-cache-dir . && \
     apk del .build-deps && \
     rm -rf /var/lib/apk/*
