@@ -104,7 +104,7 @@ class TestWorldPop:
                     "dataset_date": "[2015-01-01T00:00:00 TO 2030-12-31T23:59:59]",
                     "groups": [{"name": "afg"}],
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
-                    "name": "worldpop-population-counts-constrained-2015-2030-afg",
+                    "name": "worldpop-population-counts-2015-2030-afg",
                     "notes": "Constrained estimates, total number of people per grid-cell. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are number of people per pixel. The mapping approach is Random Forest-based dasymetric redistribution.&nbsp;  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
@@ -118,7 +118,7 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "Afghanistan - Spatial Distribution of Population (constrained 2015-2030)",
+                    "title": "Afghanistan - Spatial Distribution of Population (2015-2030)",
                 }
                 resources = dataset.get_resources()
                 assert len(resources) == 16
@@ -139,7 +139,7 @@ class TestWorldPop:
                     "dataset_date": "[2015-01-01T00:00:00 TO 2030-12-31T23:59:59]",
                     "groups": [{"name": "afg"}],
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
-                    "name": "worldpop-age-and-sex-structures-constrained-2015-2030-afg",
+                    "name": "worldpop-age-and-sex-structures-2015-2030-afg",
                     "notes": "Constrained estimates of total number of people per grid square broken down by gender and age groupings (including 0-1 and by 5-year up to 90+) for Afghanistan, version v1. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are estimated number of male, female or both in each age group per grid square.&nbsp;  \n  \nThe difference between constrained and unconstrained you can read on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained  \n  \n**File Descriptions:**  \n  \n_{iso}\xa0{gender}\xa0{age group}\xa0{year}\xa0{type}\xa0{resolution}.tif_  \n  \n_iso_  \n  \nThree-letter country code  \n  \n_gender_  \n  \nm = male, f= female, t = both genders  \n  \n_age group_  \n  \n*   00 = age group 0 to 12 months  \n*   01 = age group 1 to 4 years  \n*   05 = age group 5 to 9 years  \n*   90 = age 90 years and over  \n  \n_year_  \n  \nYear that the population represents  \n  \n_type_  \n  \nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/) , UC= [Unconstrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)  \n  \n_resolution_  \n  \nResolution of the data e.q. 100m = 3 arc (approximately 100m at the equator)",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
@@ -157,7 +157,7 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "Afghanistan - Age and Sex Structures (constrained 2015-2030)",
+                    "title": "Afghanistan - Age and Sex Structures (2015-2030)",
                 }
                 resources = dataset.get_resources()
                 assert len(resources) == 641
@@ -174,7 +174,7 @@ class TestWorldPop:
                 assert len(showcases) == 2
                 assert showcases[0] == {
                     "image_url": "https://hub.worldpop.org/tabs/gdata/img/52025/afg_pop_2019_CN_100m_R2024B_v1_Image.png",
-                    "name": "worldpop-population-counts-constrained-2015-2030-afg-showcase",
+                    "name": "worldpop-population-counts-2015-2030-afg-showcase",
                     "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
                     "tags": [
                         {
@@ -191,7 +191,7 @@ class TestWorldPop:
                 }
                 assert showcases[1] == {
                     "image_url": "https://hub.worldpop.org/tabs/gdata/img/52828/afg_agesex_CN_100m_R2024B_v1_Image.png",
-                    "name": "worldpop-age-and-sex-structures-constrained-2015-2030-afg-showcase",
+                    "name": "worldpop-age-and-sex-structures-2015-2030-afg-showcase",
                     "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
                     "tags": [
                         {

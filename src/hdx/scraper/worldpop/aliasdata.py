@@ -56,11 +56,8 @@ class AliasData:
         start_year = self._metadata["popyear"]
         end_year = self._metadata["endpopyear"]
         year_range = f"{start_year}-{end_year}"
-        category_shorter = f"{estimate_type.lower()} {year_range}"
-        title = f"{title} ({category_shorter})"
-        name = slugify(
-            f"worldpop-{project}-{category_shorter}-{self._countryiso3}"
-        )
+        title = f"{title} ({year_range})"
+        name = slugify(f"worldpop-{project}-{year_range}-{self._countryiso3}")
         logger.info(f"Creating dataset: {title}")
         dataset["name"] = name
         dataset["title"] = title
