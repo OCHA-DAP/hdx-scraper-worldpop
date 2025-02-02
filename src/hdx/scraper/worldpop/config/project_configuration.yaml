@@ -2,7 +2,7 @@
 json_url: "https://hub.worldpop.org/rest/data/"
 indicators:
   pop: "G2_CN_POP_R24B_100m"
-#  age_structures: "G2_CN_Age_R24B_100m"
+  age_structures: "G2_CN_Age_R24B_3a_z"
 
 caveat_prefix: "Data for earlier dates is available directly from WorldPop  \n  \n"
 
