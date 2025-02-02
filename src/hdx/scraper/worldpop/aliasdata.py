@@ -42,6 +42,10 @@ class AliasData:
         citation = self._metadata["citation"]
         return f"{disclaimer}{self._configuration['caveat_prefix']}{citation}"
 
+    def replace_countryname(self, title):
+        title = title.split(" - ")
+        return f"{self._countryname} - {title[1]}"
+
     def generate_dataset_and_showcase(self):
         dataset = Dataset()
         try:
@@ -51,7 +55,7 @@ class AliasData:
             return None, None
         project = self._metadata["project"]
         category = self._metadata["category"]
-        title = self._metadata["title"]
+        title = self.replace_countryname(self._metadata["title"])
         estimate_type, _ = category.split(maxsplit=1)
         start_year = self._metadata["popyear"]
         end_year = self._metadata["endpopyear"]
