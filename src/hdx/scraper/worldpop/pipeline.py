@@ -18,9 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 class Pipeline:
-    def __init__(self, retriever: Retrieve, configuration: Configuration):
+    def __init__(
+        self, retriever: Retrieve, configuration: Configuration, year: int
+    ):
         self._retriever = retriever
         self._configuration = configuration
+        self._year = year
         self._json_url = configuration["json_url"]
         self._indicators = configuration["indicators"]
         self._indicators_metadata = {}
@@ -79,12 +82,15 @@ class Pipeline:
             metadata_allyears = self._retriever.download_json(country_url)[
                 "data"
             ]
-            # We're going to take one year's metadata and make it for all
+            # We're going to take this year's metadata and make it for all
             # years since we're making one dataset
-            metadata = metadata_allyears[0]
+            start_year = metadata_allyears[0]["popyear"]
+            metadata = metadata_allyears[self._year - int(start_year)]
+
             # Assume that if one year is excluded, then the whole alias is out
             if metadata["public"].lower() != "y":
                 continue
+            metadata["startpopyear"] = start_year
             metadata["endpopyear"] = metadata_allyears[-1]["popyear"]
             metadata["alias"] = alias
             aliasdata = AliasData(

@@ -57,7 +57,7 @@ class AliasData:
         category = self._metadata["category"]
         title = self.replace_countryname(self._metadata["title"])
         estimate_type, _ = category.split(maxsplit=1)
-        start_year = self._metadata["popyear"]
+        start_year = self._metadata["startpopyear"]
         end_year = self._metadata["endpopyear"]
         year_range = f"{start_year}-{end_year}"
         title = f"{title} ({year_range})"
@@ -66,10 +66,11 @@ class AliasData:
         dataset["name"] = name
         dataset["title"] = title
         notes_suffix = self._configuration["notes_suffix"]
+        year = self._metadata["popyear"]
         desc = (
             self._metadata["desc"]
-            .replace(f" in {start_year}", "")
-            .replace(f" of {start_year}", "")
+            .replace(f" in {year}", "")
+            .replace(f" of {year}", "")
         )
         disclaimer = desc.split("Disclaimer", maxsplit=1)
         if len(disclaimer) == 2:
@@ -100,8 +101,8 @@ class AliasData:
             showcase = Showcase(
                 {
                     "name": f"{name}-showcase",
-                    "title": f"WorldPop {self._countryname} {project} Summary Page",
-                    "notes": f"Summary for {category} - {self._countryname}",
+                    "title": f"{year} {project}",
+                    "notes": f"{self._countryname} WorldPop summary: {category}",
                     "url": url_summary,
                     "image_url": url_img,
                 }

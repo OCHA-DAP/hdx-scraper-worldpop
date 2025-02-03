@@ -76,7 +76,7 @@ class TestWorldPop:
                     save=False,
                     use_saved=True,
                 )
-                worldpop = Pipeline(retriever, configuration)
+                worldpop = Pipeline(retriever, configuration, 2025)
                 indicators_metadata = worldpop.get_indicators_metadata()
                 assert len(indicators_metadata) == 2
                 assert (
@@ -176,9 +176,10 @@ class TestWorldPop:
 
                 assert len(showcases) == 2
                 assert showcases[0] == {
-                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/52025/afg_pop_2019_CN_100m_R2024B_v1_Image.png",
+                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/52035/afg_pop_2019_CN_100m_R2024B_v1_Image.png",
                     "name": "worldpop-population-counts-2015-2030-afg-showcase",
-                    "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
+                    "notes": "Afghanistan WorldPop summary: Constrained individual countries "
+                    "2015-2030 ( 100m resolution ) R2024B v1",
                     "tags": [
                         {
                             "name": "baseline population",
@@ -189,27 +190,28 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "WorldPop Afghanistan Population Counts Summary Page",
-                    "url": "https://hub.worldpop.org/geodata/summary?id=52025",
+                    "title": "2025 Population Counts",
+                    "url": "https://hub.worldpop.org/geodata/summary?id=52035",
                 }
-                # assert showcases[1] == {
-                #     "image_url": "https://hub.worldpop.org/tabs/gdata/img/52828/afg_agesex_CN_100m_R2024B_v1_Image.png",
-                #     "name": "worldpop-age-and-sex-structures-2015-2030-afg-showcase",
-                #     "notes": "Summary for Constrained individual countries 2015-2030 ( 100m resolution ) R2024B v1 - Afghanistan",
-                #     "tags": [
-                #         {
-                #             "name": "demographics",
-                #             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
-                #         },
-                #         {
-                #             "name": "baseline population",
-                #             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
-                #         },
-                #         {
-                #             "name": "geodata",
-                #             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
-                #         },
-                #     ],
-                #     "title": "WorldPop Afghanistan Age and sex structures Summary Page",
-                #     "url": "https://hub.worldpop.org/geodata/summary?id=52828",
-                # }
+                assert showcases[1] == {
+                    "image_url": "https://hub.worldpop.org/tabs/gdata/img/53239/afg_agesex_CN_100m_R2024B_v1_Image.png",
+                    "name": "worldpop-age-and-sex-structures-2015-2030-afg-showcase",
+                    "notes": "Afghanistan WorldPop summary: Constrained individual countries "
+                    "2015-2030 ( 100m resolution ) R2024B v1-z",
+                    "tags": [
+                        {
+                            "name": "demographics",
+                            "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                        },
+                        {
+                            "name": "baseline population",
+                            "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                        },
+                        {
+                            "name": "geodata",
+                            "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
+                        },
+                    ],
+                    "title": "2025 Age and sex structures",
+                    "url": "https://hub.worldpop.org/geodata/summary?id=53239",
+                }
