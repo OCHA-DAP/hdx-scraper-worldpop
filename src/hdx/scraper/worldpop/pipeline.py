@@ -85,7 +85,15 @@ class Pipeline:
             # We're going to take this year's metadata and make it for all
             # years since we're making one dataset
             start_year = metadata_allyears[0]["popyear"]
-            metadata = metadata_allyears[self._year - int(start_year)]
+            index = self._year - int(start_year)
+            num_years = len(metadata_allyears)
+            if num_years > index:
+                metadata = metadata_allyears[self._year - int(start_year)]
+            else:
+                metadata = metadata_allyears[num_years - 1]
+                logger.error(
+                    f"{countryname} {alias} does not have data for {self._year}!"
+                )
 
             # Assume that if one year is excluded, then the whole alias is out
             if metadata["public"].lower() != "y":
