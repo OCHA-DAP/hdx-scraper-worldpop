@@ -11,4 +11,4 @@ RUN --mount=source=.git,target=.git,type=bind \
     apk del .build-deps && \
     rm -rf /var/lib/apk/*
 
-CMD "python3 -m hdx.scraper.worldpop"
+CMD "python3 run.py"

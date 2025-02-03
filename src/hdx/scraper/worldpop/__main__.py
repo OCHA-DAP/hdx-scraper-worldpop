@@ -12,6 +12,7 @@ from hdx.data.user import User
 from hdx.facades.infer_arguments import facade
 from hdx.scraper.worldpop._version import __version__
 from hdx.scraper.worldpop.pipeline import Pipeline
+from hdx.utilities.dateparse import now_utc
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import (
     progress_storing_folder,
@@ -52,7 +53,9 @@ def main(
             retriever = Retrieve(
                 downloader, folder, "saved_data", folder, save, use_saved
             )
-            worldpop = Pipeline(retriever, configuration)
+            today = now_utc()
+            year = today.year
+            worldpop = Pipeline(retriever, configuration, year)
             worldpop.get_indicators_metadata()
             _, countries = worldpop.get_countriesdata()
             logger.info(f"Number of countries to upload: {len(countries)}")
