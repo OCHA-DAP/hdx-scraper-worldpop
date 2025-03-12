@@ -80,7 +80,7 @@ class AliasData:
             disclaimer = ""
         notes = desc.split("File Descriptions:", maxsplit=1)
         dataset["notes"] = (
-            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._metadata["alias"], '')}"
+            f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._metadata['alias'], '')}"
         )
         dataset["caveats"] = self.get_caveats(disclaimer)
         dataset.set_maintainer("37023db4-a571-4f28-8d1f-15f0353586af")
