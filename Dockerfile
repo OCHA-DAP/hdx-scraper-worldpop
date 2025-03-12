@@ -4,10 +4,9 @@ WORKDIR /srv
 
 COPY . .
 
-RUN --mount=source=.git,target=.git,type=bind \
-    apk add --no-cache --upgrade --virtual .build-deps \
-        git && \
-    pip install --no-cache-dir . && \
+RUN apk add --no-cache --upgrade --virtual .build-deps \
+    git && \
+    pip --no-cache-dir install --upgrade -r requirements.txt && \
     apk del .build-deps && \
     rm -rf /var/lib/apk/*
 
