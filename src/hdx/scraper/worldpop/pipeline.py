@@ -77,7 +77,7 @@ class Pipeline:
         showcases = []
         countryname = self.get_countryname(countryiso3)
         if not countryname:
-            return
+            return None, None
         for alias, country_url in self._countriesdata[countryiso3].items():
             metadata_allyears = self._retriever.download_json(country_url)[
                 "data"
