@@ -68,9 +68,7 @@ class AliasData:
         notes_suffix = self._configuration["notes_suffix"]
         year = self._metadata["popyear"]
         desc = (
-            self._metadata["desc"]
-            .replace(f" in {year}", "")
-            .replace(f" of {year}", "")
+            self._metadata["desc"].replace(f" in {year}", "").replace(f" of {year}", "")
         )
         disclaimer = desc.split("Disclaimer", maxsplit=1)
         if len(disclaimer) == 2:

@@ -79,9 +79,7 @@ class TestWorldPop:
                 worldpop = Pipeline(retriever, configuration, 2025)
                 indicators_metadata = worldpop.get_indicators_metadata()
                 assert len(indicators_metadata) == 2
-                assert (
-                    indicators_metadata["pop"]["name"] == "Population Counts"
-                )
+                assert indicators_metadata["pop"]["name"] == "Population Counts"
                 assert (
                     indicators_metadata["age_structures"]["name"]
                     == "Age and sex structures"
@@ -96,9 +94,7 @@ class TestWorldPop:
                     countries_data["AFG"]["age_structures"]
                     == "https://hub.worldpop.org/rest/data/age_structures/G2_CN_Age_R24B_3a_z?iso3=AFG"
                 )
-                datasets, showcases = worldpop.generate_datasets_and_showcases(
-                    "AFG"
-                )
+                datasets, showcases = worldpop.generate_datasets_and_showcases("AFG")
                 assert len(datasets) == 2
                 dataset = datasets[0]
                 assert dataset == {

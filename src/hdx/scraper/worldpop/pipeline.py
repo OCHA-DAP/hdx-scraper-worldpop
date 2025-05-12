@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class Pipeline:
-    def __init__(
-        self, retriever: Retrieve, configuration: Configuration, year: int
-    ):
+    def __init__(self, retriever: Retrieve, configuration: Configuration, year: int):
         self._retriever = retriever
         self._configuration = configuration
         self._year = year
@@ -79,9 +77,7 @@ class Pipeline:
         if not countryname:
             return datasets, showcases
         for alias, country_url in self._countriesdata[countryiso3].items():
-            metadata_allyears = self._retriever.download_json(country_url)[
-                "data"
-            ]
+            metadata_allyears = self._retriever.download_json(country_url)["data"]
             # We're going to take this year's metadata and make it for all
             # years since we're making one dataset
             start_year = metadata_allyears[0]["popyear"]
