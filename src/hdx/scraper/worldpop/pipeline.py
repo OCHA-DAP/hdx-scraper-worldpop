@@ -49,6 +49,8 @@ class Pipeline:
             iso3s = set()
             for info in data:
                 iso3 = info["iso3"]
+                if iso3 == "KOS":  # remap Kosovo
+                    iso3 = "XKX"
                 if iso3 in iso3s:
                     continue
                 iso3s.add(iso3)
