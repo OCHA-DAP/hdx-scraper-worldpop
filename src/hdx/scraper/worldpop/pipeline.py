@@ -26,6 +26,7 @@ class Pipeline:
         self._indicators = configuration["indicators"]
         self._indicators_metadata = {}
         self._countriesdata = {}
+        Country.countriesdata(include_unofficial=True)
 
     def get_indicators_metadata(self):
         json = self._retriever.download_json(self._json_url)
@@ -51,11 +52,14 @@ class Pipeline:
                 iso3 = info["iso3"]
                 if iso3 == "KOS":  # remap Kosovo
                     iso3 = "XKX"
+                    url_iso3 = "KOS"
+                else:
+                    url_iso3 = iso3
                 if iso3 in iso3s:
                     continue
                 iso3s.add(iso3)
                 countrydata = self._countriesdata.get(iso3, {})
-                countrydata[alias] = f"{url}?iso3={iso3}"
+                countrydata[alias] = f"{url}?iso3={url_iso3}"
                 self._countriesdata[iso3] = countrydata
 
         countries = [{"iso3": x} for x in sorted(self._countriesdata.keys())]
