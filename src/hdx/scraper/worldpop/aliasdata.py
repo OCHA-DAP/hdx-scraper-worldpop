@@ -8,6 +8,7 @@ from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
 from hdx.utilities.dateparse import parse_date
+from hdx.utilities.matching import multiple_replace
 from hdx.utilities.path import get_filename_extension_from_url
 
 logger = logging.getLogger(__name__)
@@ -68,9 +69,7 @@ class AliasData:
         notes_suffix = self._configuration["notes_suffix"]
         year = self._metadata["popyear"]
         desc = (
-            self._metadata["desc"]
-            .replace(f" in {year}", "")
-            .replace(f" of {year}", "")
+            self._metadata["desc"].replace(f" in {year}", "").replace(f" of {year}", "")
         )
         disclaimer = desc.split("Disclaimer", maxsplit=1)
         if len(disclaimer) == 2:
@@ -138,12 +137,32 @@ class AliasData:
             match = self.distance_regex.search(filename)
             if match:
                 filename = filename[: match.end()]
+
+            name = f"{filename}{extension}".lower()
+            description = f"{self._resource_base_description}{metadata['popyear']}"
+            data_format = metadata["data_format"]
             resource = Resource(
                 {
-                    "name": f"{filename}{extension}".lower(),
+                    "name": name,
                     "url": url,
-                    "description": f"{self._resource_base_description}{metadata['popyear']}",
-                    "format": metadata["data_format"],
+                    "description": description,
+                    "format": data_format,
+                }
+            )
+            resource.set_date_data_updated(date)
+            dataset.add_update_resource(resource)
+
+            name = name.replace("100m", "1km")
+            url = multiple_replace(
+                url, {"/100m/": "/1km_ua/", "_100m_R2024B_v1": "_1km_R2024B_UA_v1"}
+            )
+            description = description.replace("100m", "1km")
+            resource = Resource(
+                {
+                    "name": name,
+                    "url": url,
+                    "description": description,
+                    "format": data_format,
                 }
             )
             resource.set_date_data_updated(date)

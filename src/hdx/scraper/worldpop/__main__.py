@@ -72,6 +72,7 @@ def main(
                         )
                     )
                     dataset.create_in_hdx(
+                        match_resource_order=True,
                         remove_additional_resources=True,
                         hxl_update=False,
                         updated_by_script="HDX Scraper: WorldPop",
