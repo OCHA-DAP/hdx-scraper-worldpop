@@ -156,17 +156,17 @@ class TestWorldPop:
                     "dataset_date": "[2015-01-01T00:00:00 TO 2030-12-31T23:59:59]",
                     "groups": [{"name": "afg"}],
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
-                    "name": "worldpop-age-and-sex-structures-2015-2030-afg",
+                    "name": "worldpop-age-and-gender-structures-2015-2030-afg",
                     "notes": "Constrained estimates of total number of people per grid square broken down by gender and age groupings (including 0-1 and by 5-year up to 90+) for Afghanistan, version v1. The dataset is available to download in Geotiff format at a resolution of 3 arc (approximately 100m at the equator). The projection is Geographic Coordinate System, WGS84. The units are estimated number of male, female or both in each age group per grid square.&nbsp;  \n  \nMore information can be found in the [Release Statement](https://data.worldpop.org/repo/prj/Global_2015_2030/R2024B/doc/Global2_Release_Statement_R2024B_v1.pdf)  \n  \nThe difference between constrained and unconstrained is explained on this page: https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained  \n  \n**File Descriptions:**  \n  \n_{iso}\xa0{gender}\xa0{age group}\xa0{year}\xa0{type}\xa0{resolution}.tif_  \n  \n_iso_  \n  \nThree-letter country code  \n  \n_gender_  \n  \nm = male, f= female, t = both genders  \n  \n_age group_  \n  \n*   00 = age group 0 to 12 months  \n*   01 = age group 1 to 4 years  \n*   05 = age group 5 to 9 years  \n*   90 = age 90 years and over  \n  \n_year_  \n  \nYear that the population represents  \n  \n_type_  \n  \nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/) , UC= [Unconstrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)  \n  \n_resolution_  \n  \nResolution of the data e.q. 100m = 3 arc (approximately 100m at the equator)",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
                     "tags": [
                         {
-                            "name": "demographics",
+                            "name": "baseline population",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
-                            "name": "baseline population",
+                            "name": "demographics",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
@@ -174,24 +174,24 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "Afghanistan - Age and Sex Structures (2015-2030)",
+                    "title": "Afghanistan - Age and Gender Structures (2015-2030)",
                 }
                 resources = dataset.get_resources()
                 assert len(resources) == 32
                 assert resources[20] == {
-                    "description": "Constrained age and sex structures (100m resolution) for 2025",
+                    "description": "Constrained age and gender structures (100m resolution) for 2025",
                     "format": "geotiff",
                     "last_modified": "2024-12-01T00:00:00.000000",
-                    "name": "afg_agesex_structures_2025_cn_100m.zip",
+                    "name": "afg_agegender_structures_2025_cn_100m.zip",
                     "resource_type": "api",
                     "url": "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2024B/2025/AFG/v1/100m/afg_agesex_structures_2025_CN_100m_R2024B_v1.zip",
                     "url_type": "api",
                 }
                 assert resources[21] == {
-                    "description": "Constrained age and sex structures (1km resolution) for 2025",
+                    "description": "Constrained age and gender structures (1km resolution) for 2025",
                     "format": "geotiff",
                     "last_modified": "2024-12-01T00:00:00.000000",
-                    "name": "afg_agesex_structures_2025_cn_1km.zip",
+                    "name": "afg_agegender_structures_2025_cn_1km.zip",
                     "resource_type": "api",
                     "url": "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2024B/2025/AFG/v1/1km_ua/afg_agesex_structures_2025_CN_1km_R2024B_UA_v1.zip",
                     "url_type": "api",
@@ -218,16 +218,16 @@ class TestWorldPop:
                 }
                 assert showcases[1] == {
                     "image_url": "https://hub.worldpop.org/tabs/gdata/img/53239/afg_agesex_CN_100m_R2024B_v1_Image.png",
-                    "name": "worldpop-age-and-sex-structures-2015-2030-afg-showcase",
+                    "name": "worldpop-age-and-gender-structures-2015-2030-afg-showcase",
                     "notes": "Afghanistan WorldPop summary: Constrained individual countries "
                     "2015-2030 ( 100m resolution ) R2024B v1-z",
                     "tags": [
                         {
-                            "name": "demographics",
+                            "name": "baseline population",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
-                            "name": "baseline population",
+                            "name": "demographics",
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                         {
@@ -235,7 +235,7 @@ class TestWorldPop:
                             "vocabulary_id": "b891512e-9516-4bf5-962a-7a289772a2a1",
                         },
                     ],
-                    "title": "2025 Age and sex structures",
+                    "title": "2025 Age and gender structures",
                     "url": "https://hub.worldpop.org/geodata/summary?id=53239",
                 }
 
@@ -278,10 +278,10 @@ class TestWorldPop:
                 dataset = datasets[1]
                 resources = dataset.get_resources()
                 assert resources[21] == {
-                    "description": "Constrained age and sex structures (1km resolution) for 2025",
+                    "description": "Constrained age and gender structures (1km resolution) for 2025",
                     "format": "geotiff",
                     "last_modified": "2024-12-01T00:00:00.000000",
-                    "name": "xkx_agesex_structures_2025_cn_1km.zip",
+                    "name": "xkx_agegender_structures_2025_cn_1km.zip",
                     "resource_type": "api",
                     "url": "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2024B/2025/XKX/v1/1km_ua/xkx_agesex_structures_2025_CN_1km_R2024B_UA_v1.zip",
                     "url_type": "api",
