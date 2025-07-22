@@ -55,8 +55,12 @@ class AliasData:
             logger.exception(f"{self._countryiso3} has a problem! {e}")
             return None, None
         project = self._metadata["project"]
+        if "sex" in project:
+            project = project.replace("sex", "gender")
         category = self._metadata["category"]
         title = self.replace_countryname(self._metadata["title"])
+        if "Sex" in title:
+            title = title.replace("Sex", "Gender")
         estimate_type, _ = category.split(maxsplit=1)
         start_year = self._metadata["startpopyear"]
         end_year = self._metadata["endpopyear"]
@@ -139,6 +143,8 @@ class AliasData:
                 filename = filename[: match.end()]
 
             name = f"{filename}{extension}".lower()
+            if "sex" in name:
+                name = name.replace("sex", "gender")
             description = f"{self._resource_base_description}{metadata['popyear']}"
             data_format = metadata["data_format"]
             resource = Resource(
