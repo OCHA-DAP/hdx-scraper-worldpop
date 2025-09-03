@@ -1,7 +1,7 @@
 package_creator: "mcarans"
 methodology: "Other"
-methodology_other: "Please follow this link to methodology information: https://www.worldpop.org/methods/"
+methodology_other: "Methodology information can be found in the [Release Statement](https://data.worldpop.org/repo/prj/Global_2015_2030/R2025A/doc/Global2_Release_Statement_R2025A_v1.pdf)"
 dataset_source: "Multiple sources"
 license_id: "hdx-other"
-license_other: "Please follow this link to licence information: https://hub.worldpop.org/data/licence.txt"
+license_other: "[WorldPop licence information](https://hub.worldpop.org/data/licence.txt)"
 private: False

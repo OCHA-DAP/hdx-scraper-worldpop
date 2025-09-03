@@ -3,6 +3,7 @@ import re
 
 from slugify import slugify
 
+from hdx.api.utilities.date_helper import DateHelper
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
@@ -81,7 +82,10 @@ class AliasData:
             disclaimer = f"Disclaimer{disclaimer[1]}  \n  \n"
         else:
             disclaimer = ""
-        notes = desc.split("File Descriptions:", maxsplit=1)
+        if "More information" in desc:
+            notes = desc.split("More information", maxsplit=1)
+        else:
+            notes = desc.split("File Descriptions:", maxsplit=1)
         dataset["notes"] = (
             f"{notes[0]}{notes_suffix['global']}{notes_suffix.get(self._metadata['alias'], '')}"
         )
@@ -90,7 +94,9 @@ class AliasData:
         dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
         dataset.set_expected_update_frequency("Every year")
         dataset.set_subnational(True)
-        dataset.set_time_period_year_range(start_year, end_year)
+        startdate = DateHelper.get_hdx_date(f"{start_year}-01-01", True)
+        enddate = DateHelper.get_hdx_date(f"{end_year}-01-01", True)
+        dataset["dataset_date"] = f"[{startdate} TO {enddate}]"
         dataset.add_tags(self.get_tags())
 
         bracketed_text = category.split("(", 1)[1].split(")")[0].strip()
@@ -116,23 +122,9 @@ class AliasData:
         return dataset, showcase
 
     def add_resource_to(self, dataset, metadata):
-        """Parse json of the form:
-        {'id': '1482', 'title': 'The spatial distribution of population in 2000,
-            Zimbabwe', 'desc': 'Estimated total number of people per grid-cell...',  'doi': '10.5258/SOTON/WP00645',
-            'date': '2018-11-01', 'popyear': '2000', 'citation': 'WorldPop',
-            'data_file': 'GIS/Population/Global_2000_2020/2000/ZWE/zwe_ppp_2000.tif', 'archive': 'N', 'public': 'Y',
-            'source': 'WorldPop, University of Southampton, UK', 'data_format': 'Geotiff', 'author_email': 'wp@worldpop.uk',
-            'author_name': 'WorldPop', 'maintainer_name': 'WorldPop', 'maintainer_email': 'wp@worldpop.uk',
-            'project': 'Population', 'category': 'Global per country 2000-2020', 'gtype': 'Population',
-            'continent': 'Africa', 'country': 'Zimbabwe', 'iso3': 'ZWE',
-            'files': ['ftp://ftp.worldpop.org.uk/GIS/Population/Global_2000_2020/2000/ZWE/zwe_ppp_2000.tif'],
-            'url_img': 'https://www.worldpop.org/tabs/gdata/img/1482/zwe_ppp_wpgp_2000_Image.png',
-            'organisation': 'WorldPop, University of Southampton, UK, www.worldpop.org',
-            'license': 'https://www.worldpop.org/data/licence.txt',
-            'url_summary': 'https://www.worldpop.org/geodata/summary?id=1482'}
-        """
         date = parse_date(
-            metadata["date"],
+            # metadata["date"],
+            "2025-09-01",
             timezone_handling=3,
             include_microseconds=True,
         )
@@ -160,7 +152,7 @@ class AliasData:
 
             name = name.replace("100m", "1km")
             url = multiple_replace(
-                url, {"/100m/": "/1km_ua/", "_100m_R2024B_v1": "_1km_R2024B_UA_v1"}
+                url, {"/100m/": "/1km_ua/", "_100m_R2025A_v1": "_1km_R2025A_UA_v1"}
             )
             description = description.replace("100m", "1km")
             resource = Resource(
