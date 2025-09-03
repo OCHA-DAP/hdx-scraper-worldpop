@@ -85,7 +85,7 @@ markupsafe==3.0.2
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.7.0
+more-itertools==10.8.0
     # via inflect
 num2words==0.5.14
     # via quantulum3

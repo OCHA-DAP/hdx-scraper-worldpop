@@ -3,6 +3,7 @@ import re
 
 from slugify import slugify
 
+from hdx.api.utilities.date_helper import DateHelper
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
@@ -93,7 +94,9 @@ class AliasData:
         dataset.set_organization("3f077dff-1d05-484d-a7c2-4cb620f22689")
         dataset.set_expected_update_frequency("Every year")
         dataset.set_subnational(True)
-        dataset.set_time_period_year_range(start_year, end_year)
+        startdate = DateHelper.get_hdx_date(f"{start_year}-01-01", True)
+        enddate = DateHelper.get_hdx_date(f"{end_year}-01-01", True)
+        dataset["dataset_date"] = f"[{startdate} TO {enddate}]"
         dataset.add_tags(self.get_tags())
 
         bracketed_text = category.split("(", 1)[1].split(")")[0].strip()
@@ -120,7 +123,8 @@ class AliasData:
 
     def add_resource_to(self, dataset, metadata):
         date = parse_date(
-            metadata["date"],
+            # metadata["date"],
+            "2025-09-01",
             timezone_handling=3,
             include_microseconds=True,
         )
