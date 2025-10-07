@@ -77,15 +77,8 @@ class TestWorldPop:
                     save=False,
                     use_saved=True,
                 )
-                worldpop = Pipeline(retriever, configuration, 2025)
-                indicators_metadata = worldpop.get_indicators_metadata()
-                assert len(indicators_metadata) == 2
-                assert indicators_metadata["pop"]["name"] == "Population Counts"
-                assert (
-                    indicators_metadata["age_structures"]["name"]
-                    == "Age and sex structures"
-                )
-                countries_data, countries = worldpop.get_countriesdata()
+                pipeline = Pipeline(retriever, configuration, 2025)
+                countries_data, countries = pipeline.get_countriesdata()
                 assert len(countries_data) == 242
                 assert (
                     countries_data["AFG"]["pop"]
@@ -103,7 +96,7 @@ class TestWorldPop:
                     countries_data["XKX"]["age_structures"]
                     == "https://hub.worldpop.org/rest/data/age_structures/G2_CN_Age_R25A_3a_z?iso3=KOS"
                 )
-                datasets, showcases = worldpop.generate_datasets_and_showcases("AFG")
+                datasets, showcases = pipeline.generate_datasets_and_showcases("AFG")
                 assert len(datasets) == 2
                 dataset = datasets[0]
                 assert dataset == {
@@ -231,7 +224,7 @@ class TestWorldPop:
                     "url": "https://hub.worldpop.org/geodata/summary?id=103295",
                 }
 
-                datasets, showcases = worldpop.generate_datasets_and_showcases("XKX")
+                datasets, showcases = pipeline.generate_datasets_and_showcases("XKX")
                 assert len(datasets) == 2
                 dataset = datasets[0]
                 assert dataset == {

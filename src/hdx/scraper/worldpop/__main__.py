@@ -5,7 +5,9 @@ Top level script. Calls other functions that generate datasets that this script 
 """
 
 import logging
+from os import getenv
 from os.path import expanduser, join
+from typing import Optional
 
 from hdx.api.configuration import Configuration
 from hdx.data.user import User
@@ -21,18 +23,22 @@ from hdx.utilities.path import (
 )
 from hdx.utilities.retriever import Retrieve
 
+from hdx.scraper.worldpop.sheet import Sheet
+
 logger = logging.getLogger(__name__)
 
 lookup = "hdx-scraper-worldpop"
 
 
 def main(
+    gsheet_auth: Optional[str] = None,
     save: bool = False,
     use_saved: bool = False,
 ) -> None:
     """Generate datasets and create them in HDX
 
     Args:
+        gsheet_auth (Optional[str]): Google Sheets authorisation. Defaults to None.
         save (bool): Save downloaded data. Defaults to False.
         use_saved (bool): Use saved data. Defaults to False.
     Returns:
@@ -53,16 +59,19 @@ def main(
             retriever = Retrieve(
                 downloader, folder, "saved_data", folder, save, use_saved
             )
+            if gsheet_auth is None:
+                gsheet_auth = getenv("GSHEET_AUTH")
+            sheet = Sheet(gsheet_auth, configuration)
+            metadata = sheet.get_metadata()
             today = now_utc()
             year = today.year
-            worldpop = Pipeline(retriever, configuration, year)
-            worldpop.get_indicators_metadata()
-            _, countries = worldpop.get_countriesdata()
+            pipeline = Pipeline(retriever, configuration, metadata, year)
+            _, countries = pipeline.get_countriesdata()
             logger.info(f"Number of countries to upload: {len(countries)}")
 
             for _, country in progress_storing_folder(info, countries, "iso3"):
                 countryiso3 = country["iso3"]
-                datasets, showcases = worldpop.generate_datasets_and_showcases(
+                datasets, showcases = pipeline.generate_datasets_and_showcases(
                     countryiso3
                 )
                 for i, dataset in enumerate(datasets):
