@@ -1,15 +1,12 @@
 import logging
-import re
-
-from hdx.location.country import Country
 
 from hdx.api.utilities.date_helper import DateHelper
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
+from hdx.location.country import Country
 from hdx.utilities.dateparse import parse_date
-from hdx.utilities.matching import multiple_replace
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +42,14 @@ class DatasetGenerator:
         countryname = Country.get_country_name_from_iso3(self._countryiso3)
         start_year = self._metadata["startpopyear"]
         end_year = self._metadata["endpopyear"]
-        title = hdx_metadata["Dataset Title"].format(countryname=countryname, startyear=start_year, endyear=end_year)
+        title = hdx_metadata["Dataset Title"].format(
+            countryname=countryname, startyear=start_year, endyear=end_year
+        )
         logger.info(f"Creating dataset: {title}")
         dataset["title"] = title
-        name = hdx_metadata["Dataset Name"].format(startyear=start_year, endyear=end_year, iso3=self._countryiso3.lower())
+        name = hdx_metadata["Dataset Name"].format(
+            startyear=start_year, endyear=end_year, iso3=self._countryiso3.lower()
+        )
         dataset["name"] = name
         dataset["notes"] = hdx_metadata["Dataset Description"]
         dataset["dataset_source"] = hdx_metadata["Source"]
@@ -67,12 +68,14 @@ class DatasetGenerator:
         url_img = self._metadata["url_img"]
         if url_img:
             url_summary = self._metadata["url_summary"]
-            year=self._metadata["popyear"]
+            year = self._metadata["popyear"]
             showcase = Showcase(
                 {
                     "name": f"{name}-showcase",
                     "title": hdx_metadata["Showcase Title"].format(year=year),
-                    "notes": hdx_metadata["Showcase Description"].format(countryname=countryname, startyear=start_year, endyear=end_year),
+                    "notes": hdx_metadata["Showcase Description"].format(
+                        countryname=countryname, startyear=start_year, endyear=end_year
+                    ),
                     "url": url_summary,
                     "image_url": url_img,
                 }
@@ -87,8 +90,12 @@ class DatasetGenerator:
         iso3 = metadata["iso3"]
         year = metadata["popyear"]
         for url in sorted(metadata["files"], reverse=True):
-            name = hdx_metadata["Resource Name"].format(iso3=iso3.lower(), year=year, resolution=resolution)
-            description = hdx_metadata["Resource Description"].format(resolution=resolution, year=year)
+            name = hdx_metadata["Resource Name"].format(
+                iso3=iso3.lower(), year=year, resolution=resolution
+            )
+            description = hdx_metadata["Resource Description"].format(
+                resolution=resolution, year=year
+            )
             data_format = metadata["data_format"]
             resource = Resource(
                 {

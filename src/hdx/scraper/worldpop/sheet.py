@@ -3,6 +3,7 @@ import logging
 from typing import Dict
 
 import gspread
+
 from hdx.api.configuration import Configuration
 from hdx.utilities.dictandlist import dict_of_lists_add
 

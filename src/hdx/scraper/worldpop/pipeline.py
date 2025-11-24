@@ -12,8 +12,6 @@ from typing import Dict
 
 from hdx.api.configuration import Configuration
 from hdx.location.country import Country
-from hdx.utilities.dictandlist import dict_of_lists_add
-
 from hdx.scraper.worldpop.dataset_generator import DatasetGenerator
 from hdx.utilities.retriever import Retrieve
 
@@ -21,7 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 class Pipeline:
-    def __init__(self, retriever: Retrieve, configuration: Configuration, metadata: Dict, year: int):
+    def __init__(
+        self,
+        retriever: Retrieve,
+        configuration: Configuration,
+        metadata: Dict,
+        year: int,
+    ):
         self._retriever = retriever
         self._configuration = configuration
         self._hdx_metadata = metadata

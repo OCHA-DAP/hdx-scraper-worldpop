@@ -14,6 +14,7 @@ from hdx.data.user import User
 from hdx.facades.infer_arguments import facade
 from hdx.scraper.worldpop._version import __version__
 from hdx.scraper.worldpop.pipeline import Pipeline
+from hdx.scraper.worldpop.sheet import Sheet
 from hdx.utilities.dateparse import now_utc
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import (
@@ -22,8 +23,6 @@ from hdx.utilities.path import (
     wheretostart_tempdir_batch,
 )
 from hdx.utilities.retriever import Retrieve
-
-from hdx.scraper.worldpop.sheet import Sheet
 
 logger = logging.getLogger(__name__)
 
