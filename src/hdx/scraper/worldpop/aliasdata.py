@@ -10,7 +10,7 @@ from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
 from hdx.utilities.dateparse import parse_date
 from hdx.utilities.matching import multiple_replace
-from hdx.utilities.path import get_filename_extension_from_url
+from hdx.utilities.url import get_filename_extension_from_url
 
 logger = logging.getLogger(__name__)
 
