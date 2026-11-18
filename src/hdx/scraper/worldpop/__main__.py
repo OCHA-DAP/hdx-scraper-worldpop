@@ -31,6 +31,7 @@ lookup = "hdx-scraper-worldpop"
 
 def main(
     gsheet_auth: Optional[str] = None,
+    worldpop_api_key: Optional[str] = None,
     save: bool = False,
     use_saved: bool = False,
 ) -> None:
@@ -38,12 +39,17 @@ def main(
 
     Args:
         gsheet_auth (Optional[str]): Google Sheets authorisation. Defaults to None.
+        worldpop_api_key (Optional[str]): WorldPop API v3 key. Defaults to None.
         save (bool): Save downloaded data. Defaults to False.
         use_saved (bool): Use saved data. Defaults to False.
     Returns:
         None
     """
 
+    if gsheet_auth is None:
+        gsheet_auth = getenv("GSHEET_AUTH")
+    if not gsheet_auth:
+        raise ValueError("No Google Sheets auth: set GSHEET_AUTH or pass --gsheet-auth")
     logger.info(f"##### {lookup} version {__version__} ####")
     configuration = Configuration.read()
     if not User.check_current_user_organization_access(
@@ -54,17 +60,30 @@ def main(
         )
     with wheretostart_tempdir_batch(lookup) as info:
         folder = info["folder"]
-        with Download() as downloader:
+        if worldpop_api_key is None:
+            worldpop_api_key = getenv("WORLDPOP_API_KEY")
+        if worldpop_api_key:
+            # Keyed limit is 300 requests a minute
+            kwargs = {
+                "headers": {"X-API-Key": worldpop_api_key},
+                "rate_limit": {"calls": 4, "period": 1},
+            }
+        else:
+            logger.warning("No WorldPop API key: using anonymous limits")
+            # Anonymous limit is 60 requests a minute
+            kwargs = {"rate_limit": {"calls": 1, "period": 1.1}}
+        with Download(**kwargs) as downloader, Download() as hub_downloader:
             retriever = Retrieve(
                 downloader, folder, "saved_data", folder, save, use_saved
             )
-            if gsheet_auth is None:
-                gsheet_auth = getenv("GSHEET_AUTH")
+            hub_retriever = Retrieve(
+                hub_downloader, folder, "saved_data", folder, save, use_saved
+            )
             sheet = Sheet(gsheet_auth, configuration)
             metadata = sheet.get_metadata()
             today = now_utc()
             year = today.year
-            pipeline = Pipeline(retriever, configuration, metadata, year)
+            pipeline = Pipeline(retriever, hub_retriever, configuration, metadata, year)
             _, countries = pipeline.get_countriesdata()
             logger.info(f"Number of countries to upload: {len(countries)}")
 

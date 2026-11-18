@@ -1,3 +1,17 @@
 # Collector specific configuration
-json_url: "https://hub.worldpop.org/rest/data/"
+base_url: "https://api.worldpop.org/v3/"
 spreadsheet_url: "https://docs.google.com/spreadsheets/d/1TxeudQmWgOQcAQ1N2e94NzZ3l6T6n0Dq2-X48gkUBIw/edit?gid=1950485148#gid=1950485148"
+hub_url: "https://hub.worldpop.org/rest/data/"
+hub_summary_url: "https://hub.worldpop.org/geodata/summary?id={id}"
+showcase_image_url: "https://api.worldpop.org/v3/profiles/place.png?iso3={iso3}"
+# Sheet alias -> key in v3 /countries/{iso3}/files, resource format and
+# hub REST path (used for the country showcase URL)
+aliases:
+  pop:
+    key: "population"
+    format: "Geotiff"
+    hub: "pop/G2_CN_POP_R25A_100m"
+  age_structures:
+    key: "agesex"
+    format: "Geotiff"
+    hub: "age_structures/G2_CN_Age_R25A_3a_z"

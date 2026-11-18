@@ -21,13 +21,11 @@ class Sheet:
     def get_metadata(self) -> Dict[str, Dict]:
         all_metadata = {}
         ind_sheet = self._spreadsheet.worksheet("Indicators")
-        for ind_row in ind_sheet.get_values("A2:C"):
+        for ind_row in ind_sheet.get_values("A2:B"):
             alias = ind_row[0]
             resolution = ind_row[1]
-            indicator = ind_row[2]
             metadata = all_metadata.get(alias, {})
             dict_of_lists_add(metadata, "Resolution", resolution)
-            dict_of_lists_add(metadata, "Indicator", indicator)
             sheet = self._spreadsheet.worksheet(alias)
             for row in sheet.get_values("A2:B"):
                 metadata[row[0]] = row[1]

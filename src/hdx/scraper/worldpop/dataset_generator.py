@@ -1,11 +1,11 @@
 import logging
+import re
 
 from hdx.api.utilities.date_helper import DateHelper
 from hdx.data.dataset import Dataset
 from hdx.data.hdxobject import HDXError
 from hdx.data.resource import Resource
 from hdx.data.showcase import Showcase
-from hdx.location.country import Country
 from hdx.utilities.dateparse import parse_date
 
 logger = logging.getLogger(__name__)
@@ -14,22 +14,25 @@ logger = logging.getLogger(__name__)
 class DatasetGenerator:
     def __init__(
         self,
-        retriever,
         configuration,
         countryiso3,
         countryname,
         metadata,
     ):
-        self._retriever = retriever
         self._configuration = configuration
         self._countryiso3 = countryiso3
         self._countryname = countryname
         self._metadata = metadata
-        self._showcase = {}
-        self._resource_description = None
 
-    def get_showcase(self):
-        return self._showcase
+    @staticmethod
+    def fill(text: str, **values) -> str:
+        """Substitute {name} placeholders for the given names only, leaving other
+        braces in sheet text (e.g. {iso} {year}) untouched."""
+        return re.sub(
+            r"\{(" + "|".join(map(re.escape, values)) + r")\}",
+            lambda m: str(values[m.group(1)]),
+            text,
+        )
 
     def generate_dataset_and_showcase(self):
         dataset = Dataset()
@@ -39,11 +42,10 @@ class DatasetGenerator:
             logger.exception(f"{self._countryiso3} has a problem! {e}")
             return None, None
         hdx_metadata = self._metadata["hdx_metadata"]
-        countryname = Country.get_country_name_from_iso3(self._countryiso3)
         start_year = self._metadata["startpopyear"]
         end_year = self._metadata["endpopyear"]
         title = hdx_metadata["Dataset Title"].format(
-            countryname=countryname, startyear=start_year, endyear=end_year
+            countryname=self._countryname, startyear=start_year, endyear=end_year
         )
         logger.info(f"Creating dataset: {title}")
         dataset["title"] = title
@@ -51,7 +53,12 @@ class DatasetGenerator:
             startyear=start_year, endyear=end_year, iso3=self._countryiso3.lower()
         )
         dataset["name"] = name
-        dataset["notes"] = hdx_metadata["Dataset Description"]
+        dataset["notes"] = self.fill(
+            hdx_metadata["Dataset Description"],
+            countryname=self._countryname,
+            startyear=start_year,
+            endyear=end_year,
+        )
         dataset["dataset_source"] = hdx_metadata["Source"]
         dataset["methodology_other"] = hdx_metadata["Methodology"]
         dataset["license_other"] = hdx_metadata["Licence"]
@@ -65,51 +72,46 @@ class DatasetGenerator:
         startdate = DateHelper.get_hdx_date(f"{start_year}-01-01", True)
         enddate = DateHelper.get_hdx_date(f"{end_year}-01-01", True)
         dataset["dataset_date"] = f"[{startdate} TO {enddate}]"
-        url_img = self._metadata["url_img"]
-        if url_img:
-            url_summary = self._metadata["url_summary"]
-            year = self._metadata["popyear"]
-            showcase = Showcase(
-                {
-                    "name": f"{name}-showcase",
-                    "title": hdx_metadata["Showcase Title"].format(year=year),
-                    "notes": hdx_metadata["Showcase Description"].format(
-                        countryname=countryname, startyear=start_year, endyear=end_year
-                    ),
-                    "url": url_summary,
-                    "image_url": url_img,
-                }
-            )
-            showcase.add_tags(tags)
-        else:
-            showcase = None
+        year = self._metadata["popyear"]
+        showcase = Showcase(
+            {
+                "name": f"{name}-showcase",
+                "title": hdx_metadata["Showcase Title"].format(year=year),
+                "notes": self.fill(
+                    hdx_metadata["Showcase Description"],
+                    countryname=self._countryname,
+                    startyear=start_year,
+                    endyear=end_year,
+                ),
+                "url": self._metadata["showcase_url"],
+                "image_url": self._configuration["showcase_image_url"].format(
+                    iso3=self._countryiso3
+                ),
+            }
+        )
+        showcase.add_tags(tags)
         return dataset, showcase
 
-    def add_resource_to(self, resolution, dataset, metadata):
+    def add_resource_to(self, dataset, resolution, year, url):
         hdx_metadata = self._metadata["hdx_metadata"]
-        iso3 = metadata["iso3"]
-        year = metadata["popyear"]
-        for url in sorted(metadata["files"], reverse=True):
-            name = hdx_metadata["Resource Name"].format(
-                iso3=iso3.lower(), year=year, resolution=resolution
-            )
-            description = hdx_metadata["Resource Description"].format(
-                resolution=resolution, year=year
-            )
-            data_format = metadata["data_format"]
-            resource = Resource(
-                {
-                    "name": name,
-                    "url": url,
-                    "description": description,
-                    "format": data_format,
-                }
-            )
-            date = parse_date(
-                hdx_metadata["Last Modified"],
-                timezone_handling=3,
-                include_microseconds=True,
-            )
-
-            resource.set_date_data_updated(date)
-            dataset.add_update_resource(resource)
+        name = hdx_metadata["Resource Name"].format(
+            iso3=self._countryiso3.lower(), year=year, resolution=resolution
+        )
+        description = self.fill(
+            hdx_metadata["Resource Description"], resolution=resolution, year=year
+        )
+        resource = Resource(
+            {
+                "name": name,
+                "url": url,
+                "description": description,
+                "format": self._metadata["data_format"],
+            }
+        )
+        date = parse_date(
+            hdx_metadata["Last Modified"],
+            timezone_handling=3,
+            include_microseconds=True,
+        )
+        resource.set_date_data_updated(date)
+        dataset.add_update_resource(resource)
