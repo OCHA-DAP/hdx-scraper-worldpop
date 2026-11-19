@@ -38,10 +38,10 @@ def main(
     """Generate datasets and create them in HDX
 
     Args:
-        gsheet_auth (Optional[str]): Google Sheets authorisation. Defaults to None.
-        worldpop_api_key (Optional[str]): WorldPop API v3 key. Defaults to None.
-        save (bool): Save downloaded data. Defaults to False.
-        use_saved (bool): Use saved data. Defaults to False.
+        gsheet_auth: Google Sheets authorisation. Defaults to None.
+        worldpop_api_key: WorldPop API v3 key. Defaults to None.
+        save: Save downloaded data. Defaults to False.
+        use_saved: Use saved data. Defaults to False.
     Returns:
         None
     """
