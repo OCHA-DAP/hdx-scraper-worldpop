@@ -30,7 +30,6 @@ lookup = "hdx-scraper-worldpop"
 
 
 def main(
-    gsheet_auth: str | None = None,
     worldpop_api_key: str | None = None,
     save: bool = False,
     use_saved: bool = False,
@@ -38,7 +37,6 @@ def main(
     """Generate datasets and create them in HDX
 
     Args:
-        gsheet_auth: Google Sheets authorisation. Defaults to None.
         worldpop_api_key: WorldPop API v3 key. Defaults to None.
         save: Save downloaded data. Defaults to False.
         use_saved: Use saved data. Defaults to False.
@@ -46,10 +44,6 @@ def main(
         None
     """
 
-    if gsheet_auth is None:
-        gsheet_auth = getenv("GSHEET_AUTH")
-    if not gsheet_auth:
-        raise ValueError("No Google Sheets auth: set GSHEET_AUTH or pass --gsheet-auth")
     logger.info(f"##### {lookup} version {__version__} ####")
     configuration = Configuration.read()
     if not User.check_current_user_organization_access(
@@ -79,7 +73,7 @@ def main(
             hub_retriever = Retrieve(
                 hub_downloader, folder, "saved_data", folder, save, use_saved
             )
-            sheet = Sheet(gsheet_auth, configuration)
+            sheet = Sheet(hub_retriever, configuration)
             metadata = sheet.get_metadata()
             today = now_utc()
             year = today.year
