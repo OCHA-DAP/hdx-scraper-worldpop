@@ -1,6 +1,6 @@
 # Collector specific configuration
 base_url: "https://api.worldpop.org/v3/"
-spreadsheet_url: "https://docs.google.com/spreadsheets/d/1TxeudQmWgOQcAQ1N2e94NzZ3l6T6n0Dq2-X48gkUBIw/edit?gid=1950485148#gid=1950485148"
+spreadsheet_url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRb4FtZ7tgr5oSpwK1szEpuq1SmBxCrBTaUlOvi2r9fdTEEPWXKcqkDKJB0SvwENRxc8DFAZ9E86ZzM/pub?output=csv&gid={gid}"
 hub_url: "https://hub.worldpop.org/rest/data/"
 hub_summary_url: "https://hub.worldpop.org/geodata/summary?id={id}"
 showcase_image_url: "https://api.worldpop.org/v3/profiles/place.png?iso3={iso3}"
@@ -11,14 +11,16 @@ licences:
 resolution_arcs:
   "100m": 3
   "1km": 30
-# Sheet alias -> key in v3 /countries/{iso3}/files, resource format and
-# hub REST path (used for the country showcase URL)
+# Sheet alias -> published sheet tab gid, key in v3 /countries/{iso3}/files,
+# resource format and hub REST path (used for the country showcase URL)
 aliases:
   pop:
+    gid: 0
     key: "population"
     format: "Geotiff"
     hub: "pop/G2_CN_POP_R25A_100m"
   age_structures:
+    gid: 178624798
     key: "agesex"
     format: "Geotiff"
     hub: "age_structures/G2_CN_Age_R25A_3a_z"

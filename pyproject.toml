@@ -16,7 +16,6 @@ dependencies = [
   "hdx-python-api>= 6.8.0",
   "hdx-python-country>= 4.3.1",
   "hdx-python-utilities>= 4.2.7",
-  "gspread",
 ]
 readme = "README.md"
 

@@ -8,8 +8,7 @@ Reads the [WorldPop API v3](https://api.worldpop.org/v3/) country by country and
 population and age/sex datasets (with showcases) in HDX. Resources are URLs to WorldPop files, so no
 files are stored. Dataset text comes from the "WorldPop Dataset Metadata" Google Sheet. Runs yearly.
 
-Extra inputs besides the HDX config: `GSHEET_AUTH` (Google service account JSON, or `--gsheet-auth`)
-and `WORLDPOP_API_KEY` (or `--worldpop-api-key`; anonymous limits apply without it).
+Extra input besides the HDX config: `WORLDPOP_API_KEY` (or `--worldpop-api-key`; anonymous limits apply without it).
 
 ## Commands
 
@@ -64,7 +63,7 @@ automatically on commit).
   datasets and showcases per country.
 - `dataset_generator.py`: `DatasetGenerator` builds one dataset and showcase, filling description,
   licence and citation placeholders from the sheet metadata and API.
-- `sheet.py`: `Sheet` reads the metadata Google Sheet via `gspread`.
+- `sheet.py`: `Sheet` reads the metadata Google Sheet from its published CSV tabs.
 - `config/`: `project_configuration.yaml` and `hdx_dataset_static.yaml`.
 
 ## Code Style
