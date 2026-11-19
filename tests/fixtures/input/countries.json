@@ -1,0 +1,43 @@
+{
+  "countries": [
+    {
+      "iso3": "AFG",
+      "name": "Afghanistan",
+      "region": "Asia",
+      "area_km2": 642181.6703,
+      "units": 32,
+      "years": [
+        {
+          "data_year": 2025,
+          "total_population": 43250356.53
+        }
+      ]
+    },
+    {
+      "iso3": "XKX",
+      "name": "Kosovo",
+      "region": "Europe",
+      "area_km2": 10913.0704,
+      "units": 30,
+      "years": [
+        {
+          "data_year": 2025,
+          "total_population": 1678667.87
+        }
+      ]
+    },
+    {
+      "iso3": "VAT",
+      "name": "Vatican",
+      "region": "Europe",
+      "area_km2": 0.0122,
+      "units": 1,
+      "years": [
+        {
+          "data_year": 2025,
+          "total_population": null
+        }
+      ]
+    }
+  ]
+}

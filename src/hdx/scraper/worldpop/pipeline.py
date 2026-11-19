@@ -3,118 +3,177 @@
 WORLDPOP:
 ------------
 
-Reads WorldPop JSON and creates datasets.
+Reads WorldPop API v3 and creates datasets.
 
 """
 
 import logging
+import re
 
 from hdx.api.configuration import Configuration
 from hdx.location.country import Country
-from hdx.scraper.worldpop.aliasdata import AliasData
 from hdx.utilities.retriever import Retrieve
+
+from hdx.scraper.worldpop.dataset_generator import DatasetGenerator
 
 logger = logging.getLogger(__name__)
 
 
 class Pipeline:
-    def __init__(self, retriever: Retrieve, configuration: Configuration, year: int):
+    def __init__(
+        self,
+        retriever: Retrieve,
+        hub_retriever: Retrieve,
+        configuration: Configuration,
+        metadata: dict,
+        year: int,
+    ):
         self._retriever = retriever
+        self._hub_retriever = hub_retriever
         self._configuration = configuration
+        self._base_url = configuration["base_url"]
+        self._aliases = configuration["aliases"]
+        self._hdx_metadata = metadata
         self._year = year
-        self._json_url = configuration["json_url"]
-        self._indicators = configuration["indicators"]
-        self._indicators_metadata = {}
         self._countriesdata = {}
+        self._hub_ids = {}
         Country.countriesdata(include_unofficial=True)
 
-    def get_indicators_metadata(self):
-        json = self._retriever.download_json(self._json_url)
-        aliases = list(self._indicators.keys())
-        for indicator_metadata in json["data"]:
-            alias = indicator_metadata["alias"]
-            if alias not in aliases:
+    def get_countriesdata(self) -> tuple[dict, list[dict]]:
+        url = f"{self._base_url}countries?years=all"
+        json = self._retriever.download_json(url, filename="countries.json")
+        for country in json["countries"]:
+            iso3 = country["iso3"]
+            if all(x["total_population"] is None for x in country["years"]):
+                logger.info(f"{iso3} has no data")
                 continue
-            self._indicators_metadata[alias] = indicator_metadata
-        return self._indicators_metadata
-
-    def get_countriesdata(self):
-        def download(alias, indicator):
-            url = f"{self._json_url}{alias}/{indicator}"
-            json = self._retriever.download_json(url)
-
-            return url, json["data"]
-
-        for alias, indicator in self._indicators.items():
-            url, data = download(alias, indicator)
-            iso3s = set()
-            for info in data:
-                iso3 = info["iso3"]
-                if iso3 == "KOS":  # remap Kosovo
-                    iso3 = "XKX"
-                    url_iso3 = "KOS"
-                else:
-                    url_iso3 = iso3
-                if iso3 in iso3s:
-                    continue
-                iso3s.add(iso3)
-                countrydata = self._countriesdata.get(iso3, {})
-                countrydata[alias] = f"{url}?iso3={url_iso3}"
-                self._countriesdata[iso3] = countrydata
-
+            url = f"{self._base_url}countries/{iso3}/files?years=all"
+            files = self._retriever.download_json(url, filename=f"files-{iso3}.json")
+            self._countriesdata[iso3] = files
+        self.get_hub_ids()
         countries = [{"iso3": x} for x in sorted(self._countriesdata.keys())]
         return self._countriesdata, countries
 
-    @staticmethod
-    def get_countryname(countryiso3):
-        if countryiso3 == "World":
-            return countryiso3
-        else:
-            countryname = Country.get_country_name_from_iso3(countryiso3)
-            if not countryname:
-                logger.exception(f"ISO3 {countryiso3} not recognised!")
-                return None
-            return countryname
+    def get_hub_ids(self) -> None:
+        """Read the WorldPop hub records and map (alias, ISO3, year) to the hub
+        record id used in the showcase URL. The hub uses KOS for Kosovo."""
+        for alias, aliasinfo in self._aliases.items():
+            hub = aliasinfo["hub"]
+            url = f"{self._configuration['hub_url']}{hub}"
+            filename = f"hub-{alias}.json"
+            json = self._hub_retriever.download_json(url, filename=filename)
+            for record in json["data"]:
+                iso3 = record["iso3"]
+                if iso3 == "KOS":
+                    iso3 = "XKX"
+                self._hub_ids[(alias, iso3, int(record["popyear"]))] = record["id"]
 
-    def generate_datasets_and_showcases(self, countryiso3):
+    def get_showcase_url(
+        self, alias: str, countryiso3: str, popyear: int, default: str
+    ) -> str:
+        hub_id = self._hub_ids.get((alias, countryiso3, popyear))
+        if not hub_id:
+            logger.error(f"No hub record for {countryiso3} {alias} {popyear}!")
+            return default
+        return self._configuration["hub_summary_url"].format(id=hub_id)
+
+    @staticmethod
+    def get_countryname(countryiso3: str) -> str | None:
+        countryname = Country.get_country_name_from_iso3(countryiso3)
+        if not countryname:
+            logger.error(f"ISO3 {countryiso3} not recognised!")
+            return None
+        return countryname
+
+    @staticmethod
+    def get_url(yeardata: dict, key: str, resolution: str) -> str | None:
+        files = yeardata[key]
+        if not files:
+            return None
+        url = files.get(resolution)
+        if isinstance(url, dict):  # agesex: {"zip": ..., "bands": {...}}
+            url = url["zip"]
+        return url
+
+    @staticmethod
+    def get_bands(yeardata: dict, key: str, resolution: str) -> dict[str, str]:
+        """Band name -> URL for agesex files (empty for other types)"""
+        files = yeardata[key].get(resolution)
+        return files.get("bands", {}) if isinstance(files, dict) else {}
+
+    @staticmethod
+    def get_version(url: str | None) -> str:
+        """Version (eg. v1) from a WorldPop file name like ..._R2025A_v1.tif"""
+        match = re.search(r"_(v\d+)\.\w+$", url or "")
+        return match.group(1) if match else ""
+
+    def generate_datasets_and_showcases(self, countryiso3: str) -> tuple[list, list]:
         datasets = []
         showcases = []
         countryname = self.get_countryname(countryiso3)
         if not countryname:
             return datasets, showcases
-        for alias, country_url in self._countriesdata[countryiso3].items():
-            metadata_allyears = self._retriever.download_json(country_url)["data"]
-            # We're going to take this year's metadata and make it for all
-            # years since we're making one dataset
-            start_year = metadata_allyears[0]["popyear"]
-            index = self._year - int(start_year)
-            num_years = len(metadata_allyears)
-            if num_years > index:
-                metadata = metadata_allyears[self._year - int(start_year)]
+        countrydata = self._countriesdata[countryiso3]
+        for alias, hdx_metadata in self._hdx_metadata.items():
+            key = self._aliases[alias]["key"]
+            years = [x for x in countrydata["years"] if x[key]]
+            if not years:
+                logger.error(f"{countryname} has no {alias} data!")
+                continue
+            resolutions = []
+            for yeardata in years:
+                for resolution in yeardata[key]:
+                    if resolution not in resolutions:
+                        resolutions.append(resolution)
+            start_year = years[0]["data_year"]
+            end_year = years[-1]["data_year"]
+            if start_year <= self._year <= end_year:
+                popyear = self._year
             else:
-                metadata = metadata_allyears[num_years - 1]
+                popyear = end_year
                 logger.error(
                     f"{countryname} {alias} does not have data for {self._year}!"
                 )
-
-            # Assume that if one year is excluded, then the whole alias is out
-            if metadata["public"].lower() != "y":
-                continue
-            metadata["startpopyear"] = start_year
-            metadata["endpopyear"] = metadata_allyears[-1]["popyear"]
-            metadata["alias"] = alias
-            aliasdata = AliasData(
-                self._retriever,
+            metadata = {
+                "startpopyear": start_year,
+                "endpopyear": end_year,
+                "popyear": popyear,
+                "hdx_metadata": hdx_metadata,
+                "licence": countrydata["licence"],
+                "release": countrydata["release"],
+                "resolutions": resolutions,
+                "bands": self.get_bands(years[-1], key, resolutions[0]),
+                "version": self.get_version(
+                    self.get_url(years[-1], key, resolutions[0])
+                ),
+                "citation": countrydata["citation"][key][resolutions[0]]["text"],
+                "data_format": self._aliases[alias]["format"],
+                "showcase_url": self.get_showcase_url(
+                    alias,
+                    countryiso3,
+                    popyear,
+                    countrydata["citation"][key][resolutions[0]]["url"],
+                ),
+            }
+            dataset_generator = DatasetGenerator(
                 self._configuration,
                 countryiso3,
                 countryname,
                 metadata,
             )
-            dataset, showcase = aliasdata.generate_dataset_and_showcase()
+            dataset, showcase = dataset_generator.generate_dataset_and_showcase()
             if not dataset:
                 continue
-            for metadata in metadata_allyears:
-                aliasdata.add_resource_to(dataset, metadata)
+            for yeardata in years:
+                year = yeardata["data_year"]
+                for resolution in resolutions:
+                    url = self.get_url(yeardata, key, resolution)
+                    if not url:
+                        logger.error(
+                            f"{countryname} {alias} has no {resolution} data for {year}!"
+                        )
+                        continue
+                    dataset_generator.add_resource_to(dataset, resolution, year, url)
             if len(dataset.get_resources()) == 0:
                 logger.error(f"{dataset['title']} has no data!")
             else:

@@ -3,12 +3,22 @@
 [![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-worldpop/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-worldpop?branch=main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-This script connects to the [WorldPop API](http://www.worldpop.org/) and extracts population data country by country creating a dataset per country in HDX. It makes around 1000 reads from WorldPop and then 5000 read/writes (API calls) to HDX in a one hour period. It does not create temporary files as it puts urls into HDX. It runs every year.
+This script connects to the [WorldPop API v3](https://api.worldpop.org/v3/) and extracts population and age/sex file links country by country, creating datasets per country in HDX. Dataset text comes from the "WorldPop Dataset Metadata" Google Sheet. It makes around 250 reads from WorldPop and then 5000 read/writes (API calls) to HDX in a one hour period. It does not create temporary files as it puts urls into HDX. It runs every year.
 
 
-### Usage
+## Development
 
-    python -m hdx.scraper.worldpop
+### Environment
+
+Development is currently done using Python 3.13. The environment can be created with:
+
+```shell
+    uv sync
+```
+
+This creates a .venv folder with the versions specified in the project's uv.lock file.
+
+### Installing and running
 
 For the script to run, you will need to have a file called .hdx_configuration.yaml in your home directory containing your HDX key eg.
 
@@ -19,3 +29,71 @@ For the script to run, you will need to have a file called .hdx_configuration.ya
 You will also need to supply the universal .useragents.yaml file in your home directory as specified in the parameter *user_agent_config_yaml* passed to facade in run.py. The collector reads the key **hdx-scraper-worldpop** as specified in the parameter *user_agent_lookup*.
 
 Alternatively, you can set up environment variables: USER_AGENT, HDX_KEY, HDX_SITE, BASIC_AUTH, EXTRA_PARAMS, TEMP_DIR, LOG_FILE_ONLY
+
+The script also needs:
+
+- GSHEET_AUTH: Google service account JSON with read access to the metadata sheet (or pass `--gsheet-auth`)
+- WORLDPOP_API_KEY: WorldPop API v3 key, sent as the `X-API-Key` header (or pass `--worldpop-api-key`). Without it the script runs at the anonymous limits (1000 requests a day, 60 a minute). Keys are requested at https://api.worldpop.org/v3/register
+
+To run, execute:
+
+```shell
+    uv run python -m hdx.scraper.worldpop
+```
+
+### Pre-commit
+
+pre-commit will be installed when syncing uv. It is run every time you make a git
+commit if you call it like this:
+
+```shell
+    pre-commit install
+```
+
+With pre-commit, all code is formatted according to
+[ruff](https://docs.astral.sh/ruff/) guidelines.
+
+To check if your changes pass pre-commit without committing, run:
+
+```shell
+    pre-commit run --all-files
+```
+
+## Packages
+
+[uv](https://github.com/astral-sh/uv) is used for package management.  If
+you’ve introduced a new package to the source code (i.e. anywhere in `src/`),
+please add it to the `project.dependencies` section of `pyproject.toml` with
+any known version constraints.
+
+To add packages required only for testing, add them to the
+`[dependency-groups]`.
+
+Any changes to the dependencies will be automatically reflected in
+`uv.lock` with `pre-commit`, but you can re-generate the files without committing by
+executing:
+
+```shell
+    uv lock --upgrade
+```
+
+## Project
+
+[uv](https://github.com/astral-sh/uv) is used for project management. The project can be
+built using:
+
+```shell
+    uv build
+```
+
+Linting and syntax checking can be run with:
+
+```shell
+    uv run ruff check
+```
+
+To run the tests and view coverage, execute:
+
+```shell
+    uv run pytest
+```
