@@ -78,7 +78,7 @@ def main(
             today = now_utc()
             year = today.year
             pipeline = Pipeline(retriever, hub_retriever, configuration, metadata, year)
-            _, countries = pipeline.get_countriesdata()
+            countries = pipeline.get_countriesdata()
             logger.info(f"Number of countries to upload: {len(countries)}")
 
             for _, country in progress_storing_folder(info, countries, "iso3"):

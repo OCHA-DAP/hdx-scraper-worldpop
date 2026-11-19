@@ -89,7 +89,7 @@ class TestWorldPop:
                 use_saved=True,
             )
             pipeline = Pipeline(retriever, retriever, configuration, metadata, 2025)
-            _countries_data, countries = pipeline.get_countriesdata()
+            countries = pipeline.get_countriesdata()
             # VAT has total_population null so is skipped
             assert countries == [{"iso3": "AFG"}, {"iso3": "XKX"}]
 
