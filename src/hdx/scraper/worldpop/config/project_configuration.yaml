@@ -4,6 +4,13 @@ spreadsheet_url: "https://docs.google.com/spreadsheets/d/1TxeudQmWgOQcAQ1N2e94Nz
 hub_url: "https://hub.worldpop.org/rest/data/"
 hub_summary_url: "https://hub.worldpop.org/geodata/summary?id={id}"
 showcase_image_url: "https://api.worldpop.org/v3/profiles/place.png?iso3={iso3}"
+# API licence name -> HDX license_id
+licences:
+  "CC BY 4.0": "cc-by"
+# API resolution key -> arc-second size of a grid cell
+resolution_arcs:
+  "100m": 3
+  "1km": 30
 # Sheet alias -> key in v3 /countries/{iso3}/files, resource format and
 # hub REST path (used for the country showcase URL)
 aliases:

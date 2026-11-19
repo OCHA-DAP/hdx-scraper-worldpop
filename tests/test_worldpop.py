@@ -92,6 +92,17 @@ class TestWorldPop:
                 assert countries == [{"iso3": "AFG"}, {"iso3": "XKX"}]
 
                 pop_metadata = metadata["pop"]
+                pop_citation = (
+                    "Bondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., "
+                    "McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk "
+                    "B., Brinkhoff T., Tatem A., Sorichetta A.. 2025 Constrained "
+                    "estimates of 2015-2030 total number of people per grid square at "
+                    "a resolution of 3 arc (approximately 100m at the equator) R2025A "
+                    "version v1. Global Demographic Data Project - Funded by The Bill "
+                    "and Melinda Gates Foundation (INV-045237). WorldPop - School of "
+                    "Geography and Environmental Science, University of Southampton. "
+                    "DOI:10.5258/SOTON/WP00839"
+                )
                 age_metadata = metadata["age_structures"]
                 vocabulary_id = "b891512e-9516-4bf5-962a-7a289772a2a1"
                 pop_tags = [
@@ -116,16 +127,16 @@ class TestWorldPop:
                 assert len(datasets) == 2
                 dataset = datasets[0]
                 assert dataset == {
-                    "caveats": pop_metadata["Caveats"],
+                    "caveats": pop_metadata["Caveats"] + "\n\n" + pop_citation,
                     "data_update_frequency": "365",
                     "dataset_date": "[2015-01-01T00:00:00 TO 2030-01-01T00:00:00]",
                     "dataset_source": "Multiple sources",
                     "groups": [{"name": "afg"}],
-                    "license_other": "[WorldPop licence information](https://hub.worldpop.org/data/licence.txt)",
+                    "license_id": "cc-by",
                     "maintainer": "37023db4-a571-4f28-8d1f-15f0353586af",
                     "methodology_other": pop_metadata["Methodology"],
                     "name": "worldpop-population-counts-2015-2030-afg",
-                    "notes": pop_metadata["Dataset Description"],
+                    "notes": "Estimates of the total number of people per grid cell for Afghanistan for each year from 2015 to 2030, R2025A version v1. The files are Geotiffs at 100m and 1km resolution, in the WGS84 Geographic Coordinate System. The units are number of people per pixel.\n\nMore information can be found in the [Release Statement](https://data.worldpop.org/repo/prj/Global_2015_2030/R2025A/doc/Global2_Release_Statement_R2025A_v1.pdf)\n\n**File Descriptions**\n\nEach resource is a Geotiff for one year and resolution, named:\n\n*iso*\\_*pop*\\_*year*\\_*type*\\_*resolution*.tif\n\n*iso*\n\nThree-letter country code\n\n*year*\n\nYear that the population represents\n\n*type*\n\nCN = [Constrained](https://www.worldpop.org/methods/top_down_constrained_vs_unconstrained/)\n\n*resolution*\n\nResolution of the data: 100m is 3 arc, approximately 100m at the equator; 1km is 30 arc, approximately 1km at the equator",
                     "owner_org": "3f077dff-1d05-484d-a7c2-4cb620f22689",
                     "subnational": "1",
                     "tags": pop_tags,
@@ -157,13 +168,22 @@ class TestWorldPop:
                     dataset["title"]
                     == "Afghanistan - Age and Gender Structures (2015-2030)"
                 )
-                assert dataset["notes"] == age_metadata["Dataset Description"].format(
-                    countryname="Afghanistan"
+                notes = dataset["notes"]
+                assert notes.startswith(
+                    "Estimates of the number of people per grid cell by gender and "
+                    "age group for Afghanistan for each year from 2015 to 2030, "
+                    "R2025A version v1."
                 )
+                assert "**File Descriptions**" in notes
                 assert (
-                    "(including 0-1 and by 5-year up to 90+) for Afghanistan, R2025A"
-                    in dataset["notes"]
+                    "* 00 = age group 0 to 12 months\n* 01 = age group 1 to 4 years"
+                    in notes
                 )
+                assert "100m and 1km resolution" in notes
+                assert "for example afg_f_00_2030_CN_100m_R2025A_v1.tif" in notes
+                assert "{" not in notes
+                assert dataset["caveats"].startswith(age_metadata["Caveats"])
+                assert dataset["caveats"].endswith("DOI:10.5258/SOTON/WP00841")
                 assert dataset["tags"] == age_tags
                 resources = dataset.get_resources()
                 assert len(resources) == 32
@@ -221,7 +241,7 @@ class TestWorldPop:
                     "url": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2018/XKX/v1/100m/constrained/xkx_pop_2018_CN_100m_R2025A_v1.tif",
                 }
                 dataset = datasets[1]
-                assert "for Kosovo, R2025A" in dataset["notes"]
+                assert "for Kosovo for each year" in dataset["notes"]
                 resources = dataset.get_resources()
                 assert resources[21] == {
                     "description": "Individual age and gender structures (1km resolution) for 2025",

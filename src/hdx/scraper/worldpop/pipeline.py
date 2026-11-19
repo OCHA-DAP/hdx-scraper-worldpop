@@ -8,6 +8,7 @@ Reads WorldPop API v3 and creates datasets.
 """
 
 import logging
+import re
 from typing import Dict, List, Optional, Tuple
 
 from hdx.api.configuration import Configuration
@@ -94,6 +95,18 @@ class Pipeline:
             url = url["zip"]
         return url
 
+    @staticmethod
+    def get_bands(yeardata: Dict, key: str, resolution: str) -> Dict[str, str]:
+        """Band name -> URL for agesex files (empty for other types)"""
+        files = yeardata[key].get(resolution)
+        return files.get("bands", {}) if isinstance(files, dict) else {}
+
+    @staticmethod
+    def get_version(url: Optional[str]) -> str:
+        """Version (eg. v1) from a WorldPop file name like ..._R2025A_v1.tif"""
+        match = re.search(r"_(v\d+)\.\w+$", url or "")
+        return match.group(1) if match else ""
+
     def generate_datasets_and_showcases(self, countryiso3: str) -> Tuple[List, List]:
         datasets = []
         showcases = []
@@ -103,11 +116,15 @@ class Pipeline:
         countrydata = self._countriesdata[countryiso3]
         for alias, hdx_metadata in self._hdx_metadata.items():
             key = self._aliases[alias]["key"]
-            resolutions = hdx_metadata["Resolution"]
             years = [x for x in countrydata["years"] if x[key]]
             if not years:
                 logger.error(f"{countryname} has no {alias} data!")
                 continue
+            resolutions = []
+            for yeardata in years:
+                for resolution in yeardata[key]:
+                    if resolution not in resolutions:
+                        resolutions.append(resolution)
             start_year = years[0]["data_year"]
             end_year = years[-1]["data_year"]
             if start_year <= self._year <= end_year:
@@ -122,6 +139,14 @@ class Pipeline:
                 "endpopyear": end_year,
                 "popyear": popyear,
                 "hdx_metadata": hdx_metadata,
+                "licence": countrydata["licence"],
+                "release": countrydata["release"],
+                "resolutions": resolutions,
+                "bands": self.get_bands(years[-1], key, resolutions[0]),
+                "version": self.get_version(
+                    self.get_url(years[-1], key, resolutions[0])
+                ),
+                "citation": countrydata["citation"][key][resolutions[0]]["text"],
                 "data_format": self._aliases[alias]["format"],
                 "showcase_url": self.get_showcase_url(
                     alias,
