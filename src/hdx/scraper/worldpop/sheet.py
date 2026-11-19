@@ -1,9 +1,7 @@
 import json
 import logging
-from typing import Dict
 
 import gspread
-
 from hdx.api.configuration import Configuration
 
 logger = logging.getLogger(__name__)
@@ -18,7 +16,7 @@ class Sheet:
         self._aliases = configuration["aliases"]
         self._spreadsheet = gc.open_by_url(configuration["spreadsheet_url"])
 
-    def get_metadata(self) -> Dict[str, Dict]:
+    def get_metadata(self) -> dict[str, dict]:
         all_metadata = {}
         for alias in self._aliases:
             sheet = self._spreadsheet.worksheet(alias)

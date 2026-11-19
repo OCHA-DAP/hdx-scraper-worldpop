@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Dict
 
 from hdx.api.utilities.date_helper import DateHelper
 from hdx.data.dataset import Dataset
@@ -37,7 +36,7 @@ class DatasetGenerator:
             raise ValueError(f"Unfilled placeholders {unfilled} in: {text}")
         return text
 
-    def get_description_values(self) -> Dict[str, str]:
+    def get_description_values(self) -> dict[str, str]:
         """Placeholder values for descriptions that come from the API data"""
         resolutions = self._metadata["resolutions"]
         arcs = self._configuration["resolution_arcs"]
@@ -55,15 +54,15 @@ class DatasetGenerator:
         }
         bands = self._metadata["bands"]
         if bands:
-            values["example_file"] = bands[sorted(bands)[0]].rsplit("/", 1)[-1]
+            values["example_file"] = bands[min(bands)].rsplit("/", 1)[-1]
         return values
 
     def generate_dataset_and_showcase(self):
         dataset = Dataset()
         try:
             dataset.add_other_location(self._countryiso3)
-        except HDXError as e:
-            logger.exception(f"{self._countryiso3} has a problem! {e}")
+        except HDXError:
+            logger.exception(f"{self._countryiso3} has a problem!")
             return None, None
         hdx_metadata = self._metadata["hdx_metadata"]
         start_year = self._metadata["startpopyear"]

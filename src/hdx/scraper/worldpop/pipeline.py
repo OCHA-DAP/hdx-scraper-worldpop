@@ -9,12 +9,12 @@ Reads WorldPop API v3 and creates datasets.
 
 import logging
 import re
-from typing import Dict, List, Optional, Tuple
 
 from hdx.api.configuration import Configuration
 from hdx.location.country import Country
-from hdx.scraper.worldpop.dataset_generator import DatasetGenerator
 from hdx.utilities.retriever import Retrieve
+
+from hdx.scraper.worldpop.dataset_generator import DatasetGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Pipeline:
         retriever: Retrieve,
         hub_retriever: Retrieve,
         configuration: Configuration,
-        metadata: Dict,
+        metadata: dict,
         year: int,
     ):
         self._retriever = retriever
@@ -39,7 +39,7 @@ class Pipeline:
         self._hub_ids = {}
         Country.countriesdata(include_unofficial=True)
 
-    def get_countriesdata(self) -> Tuple[Dict, List[Dict]]:
+    def get_countriesdata(self) -> tuple[dict, list[dict]]:
         url = f"{self._base_url}countries?years=all"
         json = self._retriever.download_json(url, filename="countries.json")
         for country in json["countries"]:
@@ -78,7 +78,7 @@ class Pipeline:
         return self._configuration["hub_summary_url"].format(id=hub_id)
 
     @staticmethod
-    def get_countryname(countryiso3: str) -> Optional[str]:
+    def get_countryname(countryiso3: str) -> str | None:
         countryname = Country.get_country_name_from_iso3(countryiso3)
         if not countryname:
             logger.error(f"ISO3 {countryiso3} not recognised!")
@@ -86,7 +86,7 @@ class Pipeline:
         return countryname
 
     @staticmethod
-    def get_url(yeardata: Dict, key: str, resolution: str) -> Optional[str]:
+    def get_url(yeardata: dict, key: str, resolution: str) -> str | None:
         files = yeardata[key]
         if not files:
             return None
@@ -96,18 +96,18 @@ class Pipeline:
         return url
 
     @staticmethod
-    def get_bands(yeardata: Dict, key: str, resolution: str) -> Dict[str, str]:
+    def get_bands(yeardata: dict, key: str, resolution: str) -> dict[str, str]:
         """Band name -> URL for agesex files (empty for other types)"""
         files = yeardata[key].get(resolution)
         return files.get("bands", {}) if isinstance(files, dict) else {}
 
     @staticmethod
-    def get_version(url: Optional[str]) -> str:
+    def get_version(url: str | None) -> str:
         """Version (eg. v1) from a WorldPop file name like ..._R2025A_v1.tif"""
         match = re.search(r"_(v\d+)\.\w+$", url or "")
         return match.group(1) if match else ""
 
-    def generate_datasets_and_showcases(self, countryiso3: str) -> Tuple[List, List]:
+    def generate_datasets_and_showcases(self, countryiso3: str) -> tuple[list, list]:
         datasets = []
         showcases = []
         countryname = self.get_countryname(countryiso3)

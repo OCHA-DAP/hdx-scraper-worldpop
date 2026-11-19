@@ -7,14 +7,10 @@ Top level script. Calls other functions that generate datasets that this script 
 import logging
 from os import getenv
 from os.path import expanduser, join
-from typing import Optional
 
 from hdx.api.configuration import Configuration
 from hdx.data.user import User
 from hdx.facades.infer_arguments import facade
-from hdx.scraper.worldpop._version import __version__
-from hdx.scraper.worldpop.pipeline import Pipeline
-from hdx.scraper.worldpop.sheet import Sheet
 from hdx.utilities.dateparse import now_utc
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import (
@@ -24,14 +20,18 @@ from hdx.utilities.path import (
 )
 from hdx.utilities.retriever import Retrieve
 
+from hdx.scraper.worldpop._version import __version__
+from hdx.scraper.worldpop.pipeline import Pipeline
+from hdx.scraper.worldpop.sheet import Sheet
+
 logger = logging.getLogger(__name__)
 
 lookup = "hdx-scraper-worldpop"
 
 
 def main(
-    gsheet_auth: Optional[str] = None,
-    worldpop_api_key: Optional[str] = None,
+    gsheet_auth: str | None = None,
+    worldpop_api_key: str | None = None,
     save: bool = False,
     use_saved: bool = False,
 ) -> None:
