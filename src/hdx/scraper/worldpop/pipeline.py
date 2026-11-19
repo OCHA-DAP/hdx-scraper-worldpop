@@ -35,24 +35,21 @@ class Pipeline:
         self._aliases = configuration["aliases"]
         self._hdx_metadata = metadata
         self._year = year
-        self._countriesdata = {}
         self._hub_ids = {}
         Country.countriesdata(include_unofficial=True)
 
-    def get_countriesdata(self) -> tuple[dict, list[dict]]:
+    def get_countriesdata(self) -> list[dict]:
         url = f"{self._base_url}countries?years=all"
         json = self._retriever.download_json(url, filename="countries.json")
+        iso3s = []
         for country in json["countries"]:
             iso3 = country["iso3"]
             if all(x["total_population"] is None for x in country["years"]):
                 logger.info(f"{iso3} has no data")
                 continue
-            url = f"{self._base_url}countries/{iso3}/files?years=all"
-            files = self._retriever.download_json(url, filename=f"files-{iso3}.json")
-            self._countriesdata[iso3] = files
+            iso3s.append(iso3)
         self.get_hub_ids()
-        countries = [{"iso3": x} for x in sorted(self._countriesdata.keys())]
-        return self._countriesdata, countries
+        return [{"iso3": x} for x in sorted(iso3s)]
 
     def get_hub_ids(self) -> None:
         """Read the WorldPop hub records and map (alias, ISO3, year) to the hub
@@ -113,7 +110,10 @@ class Pipeline:
         countryname = self.get_countryname(countryiso3)
         if not countryname:
             return datasets, showcases
-        countrydata = self._countriesdata[countryiso3]
+        url = f"{self._base_url}countries/{countryiso3}/files?years=all"
+        countrydata = self._retriever.download_json(
+            url, filename=f"files-{countryiso3}.json"
+        )
         for alias, hdx_metadata in self._hdx_metadata.items():
             key = self._aliases[alias]["key"]
             years = [x for x in countrydata["years"] if x[key]]
