@@ -33,7 +33,7 @@ Alternatively, you can set up environment variables: USER_AGENT, HDX_KEY, HDX_SI
 The script also needs:
 
 - GSHEET_AUTH: Google service account JSON with read access to the metadata sheet (or pass `--gsheet-auth`)
-- WORLDPOP_API_KEY: WorldPop API v3 key, sent as the `X-API-Key` header (or pass `--worldpop-api-key`). Without it the script runs at the anonymous limits (1000 requests a day, 60 a minute). Keys are requested at https://api.worldpop.org/v3/register
+- WORLDPOP_API_KEY: WorldPop API v3 key, sent as the `X-API-Key` header (or pass `--worldpop-api-key`). Without it the script runs at the anonymous limits (1000 requests a day, 60 a minute). Keys are requested at https://api.worldpop.org/v3/register. With a key the script makes up to 4 calls a second, and without one 1 call every 1.1 seconds, logging a warning
 
 To run, execute:
 
